@@ -1,6 +1,8 @@
 <template>
   <div id="app">
+    <StudioNavbar v-if="currentRoute == '/studio'" />
     <NavBar
+      v-else
       :darkMode="currentRoute == '/fashion' ? true : false"
       :expand="clickToExpandNavLeft"
       :showModal="switchModal"
@@ -678,13 +680,15 @@
 import NavBar from "@/components/NavBar.vue";
 import Modal from "@/components/Modal.vue";
 import profile from "@/assets/profile.png";
+import StudioNavbar from "@/components/StudioNavbar.vue";
 
 import { onMounted, reactive, toRefs } from "vue";
 export default {
   name: "App",
   components: {
     NavBar,
-    Modal
+    Modal,
+    StudioNavbar
   },
   setup() {
     const state = reactive({

@@ -268,7 +268,12 @@
             <div class="studio__nav__wrap__more__list__icon">
               <i class="fas fa-exclamation-circle"></i>
             </div>
-            <div class="studio__nav__wrap__more__list__text">Send feedback</div>
+            <div
+              class="studio__nav__wrap__more__list__text"
+              @click="switchFeedBack"
+            >
+              Send feedback
+            </div>
           </div>
         </div>
       </div>
@@ -374,6 +379,11 @@
         </div>
       </div>
     </div>
+    <div v-if="absoluteFeedback" class="studio__absolute">
+      <div class="studio__absolute__wrap">
+        <StudioSendFeedback :closeFeedback="switchFeedBack" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -395,6 +405,7 @@ import StudioSettingUploadDefault from "@/components/StudioSettingUploadDefault.
 import StudioSettingPermissions from "@/components/StudioSettingPermissions.vue";
 import StudioSettingCommunity from "@/components/StudioSettingCommunity.vue";
 import StudioSettingAgreements from "@/components/StudioSettingAgreements.vue";
+import StudioSendFeedback from "@/components/StudioSendFeedback.vue";
 import profile from "@/assets/profile.png";
 
 import { onMounted, reactive, toRefs } from "vue";
@@ -416,13 +427,15 @@ export default {
     StudioSettingUploadDefault,
     StudioSettingPermissions,
     StudioSettingCommunity,
-    StudioSettingAgreements
+    StudioSettingAgreements,
+    StudioSendFeedback
   },
   setup() {
     const state = reactive({
       widthSize: null,
-      absoluteDisplay: true,
-      dashboard: false,
+      absoluteDisplay: false,
+      absoluteFeedback: false,
+      dashboard: true,
       content: false,
       playlist: false,
       analytics: false,
@@ -431,7 +444,7 @@ export default {
       copyright: false,
       monetization: false,
       customization: false,
-      audioLibrary: true,
+      audioLibrary: false,
       settingGeneral: false,
       settingChannel: false,
       settingUploadDefault: false,
@@ -625,6 +638,10 @@ export default {
       state.settingAgreements = true;
     };
 
+    const switchFeedBack = () => {
+      state.absoluteFeedback = !state.absoluteFeedback;
+    };
+
     return {
       ...toRefs(state),
       profile,
@@ -644,7 +661,8 @@ export default {
       switchToSettingUploadDefault,
       switchToSettingPermissions,
       switchToSettingCommunity,
-      switchToSettingAgreement
+      switchToSettingAgreement,
+      switchFeedBack
     };
   }
 };
@@ -888,5 +906,10 @@ export default {
   margin-top: 60px;
   margin-left: 256px;
   overflow: auto;
+}
+.studio__absolute__wrap {
+  width: 360px;
+  height: 580px;
+  background-color: white;
 }
 </style>
