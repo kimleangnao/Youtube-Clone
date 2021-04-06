@@ -3,53 +3,36 @@
     <div class="ca__left">
       <div class="ca__left__descriptionTitle">Description</div>
       <div class="ca__left__description">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum non
-        tincidunt libero. Phasellus sed finibus enim, vel porta augue. Phasellus
-        et nisl augue. Cras consectetur massa nisl, ut elementum dui placerat
-        sit amet. Nunc at orci nisl. Duis dictum purus vel justo rutrum suscipit
-        et nec enim. Phasellus vitae elementum purus. Duis gravida tempor nulla
-        quis interdum. In nec felis pulvinar, fermentum libero et, mollis eros.
-        Vestibulum ligula justo, pretium a consequat et, commodo vel ligula. Sed
-        pharetra sollicitudin risus vitae congue. Phasellus nisl lacus, rutrum
-        dictum luctus sed, tincidunt non orci. Sed blandit dignissim mauris, sed
-        eleifend neque molestie quis.
-        <br />
-        <br />
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum non
-        tincidunt libero. Phasellus sed finibus enim, vel porta augue. Phasellus
-        et nisl augue. Cras consectetur massa nisl, ut elementum dui placerat
-        sit amet. Nunc at orci nisl. Duis dictum purus vel justo rutrum suscipit
-        et nec enim.
-        <br />
-        <br />
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum non
-        tincidunt libero. Phasellus sed finibus enim, vel porta augue. Phasellus
-        et nisl augue. Cras consectetur massa nisl, ut elementum dui placerat
-        sit amet.
+        {{ user.description }}
       </div>
-      <div class="ca__left__details">
+      <div class="ca__left__details" v-if="location">
         <div class="ca__left__details__title">
           Details
         </div>
         <div class="ca__left__details__location">
           <div class="ca__left__details__location__title">Location:</div>
-          <div class="ca__left__details__location__name">United States</div>
+          <div class="ca__left__details__location__name">
+            {{ user.location }}
+          </div>
         </div>
       </div>
       <div class="ca__left__links">
         <div class="ca__left__links__title">Links</div>
         <div class="ca__left__links__wrap">
-          <a class="ca__left__links__wrap__link" href="/">Twitter</a>
-          <a class="ca__left__links__wrap__link" href="/">Facebook</a>
-          <a class="ca__left__links__wrap__link" href="/">iOS</a>
-          <a class="ca__left__links__wrap__link" href="/">Android</a>
+          <template v-for="social in user.links" :key="social.id">
+            <a class="ca__left__links__wrap__link" :href="social.link">{{
+              social.text
+            }}</a>
+          </template>
         </div>
       </div>
     </div>
     <div class="ca__right">
       <div class="ca__right__wrap">Stats</div>
-      <div class="ca__right__wrap">Joined Dec 6, 2000</div>
-      <div class="ca__right__wrap">200,000 views</div>
+      <div class="ca__right__wrap">Joined {{ user.joinDate }}</div>
+      <div class="ca__right__wrap" v-if="totalViews">
+        {{ user.totalViews }} views
+      </div>
       <svg class="ca__right__report">
         <path
           d="M0 30 L 0 0 L 20 0 18 3 L 30 3 L 30 20 L 16 20 L 18 18 L 3 18 L 3 30 Z"
@@ -63,6 +46,14 @@
 <script>
 export default {
   name: "ChannelAbout",
+  props: {
+    user: {
+      type: Object,
+      required: true
+    },
+    totalViews: Boolean,
+    location: Boolean
+  },
   setup() {
     return {};
   }

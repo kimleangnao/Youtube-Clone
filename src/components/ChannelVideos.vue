@@ -29,31 +29,18 @@
           ? 'cv__wrap--9'
           : 'cv__wrap'
       ]"
+      v-if="user"
     >
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
+      <template v-for="video in user.videos" :key="video.id">
+        <PromoteVideo :video="video" :userId="user.id" />
+      </template>
     </div>
   </div>
 </template>
 
 <script>
 import PromoteVideo from "@/components/PromoteVideo.vue";
+
 export default {
   name: "ChannelVideos",
   components: {
@@ -63,8 +50,13 @@ export default {
     myWidth: {
       type: Number,
       required: false
+    },
+    user: {
+      type: Object,
+      required: true
     }
   },
+
   setup() {
     return {};
   }

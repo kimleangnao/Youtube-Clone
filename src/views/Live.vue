@@ -6,6 +6,8 @@
         title="Live"
         :customizeProfile="true"
         titleColor="black"
+        :subScriberAmount="2500"
+        :goBackToSection="goBackToSection"
       >
         <svg class="channelwrap__svg">
           <circle cx="45" cy="45" r="10" class="svg__white" />
@@ -48,7 +50,15 @@
     </ul>
   </div>
   <div class="live__content">
-    <LiveHome :myWidth="viewportWidth" v-if="home" />
+    <LiveHome
+      :myWidth="viewportWidth"
+      v-if="home"
+      :featurestreams="featurestreams"
+      :live="live"
+      :lived="lived"
+      :viewAll="viewAll"
+      :switchViewAll="switchViewAll"
+    />
     <LiveAbout :myWidth="viewportWidth" v-if="about" />
   </div>
 </template>
@@ -57,6 +67,7 @@
 import ChannelWrap from "@/components/ChannelWrap.vue";
 import LiveHome from "@/components/LiveHome.vue";
 import LiveAbout from "@/components/LiveAbout.vue";
+import EventService from "@/services/EventService.js";
 
 import { onMounted, reactive, toRefs } from "vue";
 
@@ -65,9 +76,56 @@ export default {
   components: { ChannelWrap, LiveHome, LiveAbout },
   setup() {
     const state = reactive({
+      viewAll: false,
       home: true,
       about: false,
-      viewportWidth: 10
+      viewportWidth: 10,
+      livestreams: [
+        {
+          id: 1008,
+          title: "Sunset at the beach",
+          profileName: "Sunsee",
+          videoLink: "Sunset.mp4",
+          category: "live",
+          profileImage: "profile.png",
+          profilePostDate: "Jan 20, 2021",
+          like: 300,
+          dislike: 50,
+          thumbnail: "sunset.jpg",
+          channelSubscriber: 8500,
+          userId: 115,
+          viewscount: 200,
+          totalViews: 13000,
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sollicitudin efficitur leo et gravida. Nulla sit amet tellus a enim commodo rhoncus et sit amet tellus.",
+          videoLength: 360,
+          comments: []
+        }
+      ],
+      featurestreams: [],
+      live: [],
+      lived: []
+    });
+
+    EventService.getLiveStreams().then(response => {
+      state.livestreams = response.data;
+      let features = [];
+      let live = [];
+      let lived = [];
+
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i].category == "livesoon") {
+          features.push(response.data[i]);
+        } else if (response.data[i].category == "live") {
+          live.push(response.data[i]);
+        } else if (response.data[i].category == "lived") {
+          lived.push(response.data[i]);
+        }
+      }
+
+      state.featurestreams = features;
+      state.live = live;
+      state.lived = lived;
     });
 
     onMounted(() => {
@@ -107,8 +165,19 @@ export default {
       state.home = false;
       state.about = true;
     };
-
-    return { ...toRefs(state), switchToHome, switchToAbout };
+    const goBackToSection = () => {
+      window.location.href = "/live";
+    };
+    const switchViewAll = () => {
+      state.viewAll = true;
+    };
+    return {
+      ...toRefs(state),
+      switchToHome,
+      switchToAbout,
+      goBackToSection,
+      switchViewAll
+    };
   }
 };
 </script>

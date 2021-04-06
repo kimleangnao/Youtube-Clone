@@ -1,100 +1,82 @@
 <template>
-  <div class="mb">
+  <div class="mb" v-if="recommendMovies && !viewAll">
     <WrapComponent
       :myWidth="myWidth"
       title="Recommended movies for you"
       :playall="false"
-      :nextButton="true"
+      :prevButton="recommendActiveIndex != 0 ? true : false"
+      :nextButton="
+        recommendMovies.length - 1 == recommendActiveIndex ? false : true
+      "
       componentType="movie"
+      :prevRecommendMovies="prevRecommendMovies"
+      :nextRecommendMovies="nextRecommendMovies"
     >
-      <template v-if="myWidth == 7">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-      </template>
-      <template v-if="myWidth == 8">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-      </template>
-      <template v-if="myWidth == 9">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-      </template>
-      <template v-if="myWidth == 10">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
+      <template
+        v-for="activeRecommendMovie in activeRecommendMovies"
+        :key="activeRecommendMovie.id"
+      >
+        <Movie
+          :activeRecommendMovie="activeRecommendMovie"
+          @click="goToMovie(activeRecommendMovie.id)"
+        />
       </template>
     </WrapComponent>
     <WrapComponent
       :myWidth="myWidth"
       title="Free To watch"
       :playall="false"
-      :nextButton="true"
+      :prevButton="false"
+      :nextButton="false"
       componentType="movie"
       :viewall="true"
+      :switchViewAll="switchViewAll"
     >
-      <template v-if="myWidth == 7">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-      </template>
-      <template v-if="myWidth == 8">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-      </template>
-      <template v-if="myWidth == 9">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-      </template>
-      <template v-if="myWidth == 10">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
+      <template
+        v-for="activeRecommendMovie in freeMoviesActiveSlider"
+        :key="activeRecommendMovie.id"
+      >
+        <Movie
+          :activeRecommendMovie="activeRecommendMovie"
+          @click="goToMovie(activeRecommendMovie.id)"
+        />
       </template>
     </WrapComponent>
     <WrapComponent
       :myWidth="myWidth"
       title="Top Selling"
       :playall="false"
-      :nextButton="true"
+      :nextButton="false"
       componentType="movie"
     >
-      <template v-if="myWidth == 7">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
+      <template
+        v-for="activeRecommendMovie in sellMovieActiveSlider"
+        :key="activeRecommendMovie.id"
+      >
+        <Movie
+          :activeRecommendMovie="activeRecommendMovie"
+          @click="goToMovie(activeRecommendMovie.id)"
+        />
       </template>
-      <template v-if="myWidth == 8">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-      </template>
-      <template v-if="myWidth == 9">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-      </template>
-      <template v-if="myWidth == 10">
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
-        <Movie title="The Fallen" />
+    </WrapComponent>
+  </div>
+  <div class="viewAll" v-if="viewAll">
+    <h3 class="viewAll__title">Free movies</h3>
+    <WrapComponent
+      :myWidth="myWidth"
+      title="Top Selling"
+      :playall="false"
+      :nextButton="false"
+      componentType="movie"
+    >
+      <template
+        v-for="activeRecommendMovie in freeMovies"
+        :key="activeRecommendMovie.id"
+      >
+        <Movie
+          :activeRecommendMovie="activeRecommendMovie"
+          @click="goToMovie(activeRecommendMovie.id)"
+        />
       </template>
     </WrapComponent>
   </div>
@@ -111,10 +93,27 @@ export default {
     myWidth: {
       type: Number,
       required: false
-    }
+    },
+    activeRecommendMovies: Array,
+    prevRecommendMovies: Function,
+    nextRecommendMovies: Function,
+    recommendActiveIndex: Number,
+    recommendMovies: Array,
+    freeMoviesActiveSlider: Array,
+    freeMovieDivide: Array,
+    freeMoviesActiveIndex: Number,
+    switchViewAll: Function,
+    viewAll: Boolean,
+    freeMovies: Array,
+    sellMovieDivide: Array,
+    sellMovieActiveIndex: Number,
+    sellMovieActiveSlider: Array
   },
   setup() {
-    return {};
+    let goToMovie = movieId => {
+      window.location.href = "/watch/" + movieId;
+    };
+    return { goToMovie };
   }
 };
 </script>
@@ -132,5 +131,12 @@ export default {
   font-weight: 500;
   text-align: left;
   line-height: 50px;
+}
+.viewAll__title {
+  text-align: left;
+  font-size: 1.2rem;
+}
+.viewAll {
+  width: 100%;
 }
 </style>

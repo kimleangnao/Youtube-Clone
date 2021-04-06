@@ -1,5 +1,187 @@
 <template>
   <div id="app">
+    <div class="app__absolute" v-if="showShare">
+      <div class="app__absolute__wrap">
+        <div class="app__absolute__wrap__head">
+          <div class="app__absolute__wrap__head__title">Share</div>
+          <div
+            class="app__absolute__wrap__head__close"
+            @click="switchShowShare"
+          >
+            <i class="fas fa-times"></i>
+          </div>
+        </div>
+        <div class="app__absolute__wrap__icons">
+          <div class="app__absolute__wrap__icons__left">
+            <div class="app__absolute__wrap__icons__left__circle">
+              <i class="fas fa-chevron-left"></i>
+            </div>
+          </div>
+
+          <div class="app__absolute__wrap__icons__content ">
+            <div
+              class="app__absolute__wrap__icons__content__circle app__absolute__wrap__icons__content__circle--embed"
+            >
+              <i class="fas fa-code"></i>
+            </div>
+            <div
+              class="app__absolute__wrap__icons__content__circle app__absolute__wrap__icons__content__circle--twitter"
+            >
+              <i class="fab fa-twitter"></i>
+            </div>
+            <div
+              class="app__absolute__wrap__icons__content__circle app__absolute__wrap__icons__content__circle--gmail"
+            >
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div
+              class="app__absolute__wrap__icons__content__circle app__absolute__wrap__icons__content__circle--reddit"
+            >
+              <i class="fab fa-reddit-alien"></i>
+            </div>
+            <div
+              class="app__absolute__wrap__icons__content__circle app__absolute__wrap__icons__content__circle--linkedin"
+            >
+              <i class="fab fa-linkedin-in"></i>
+            </div>
+
+            <div class="app__absolute__wrap__icons__content__circle"></div>
+            <div class="app__absolute__wrap__icons__content__circle"></div>
+            <div class="app__absolute__wrap__icons__content__circle"></div>
+          </div>
+
+          <div class="app__absolute__wrap__icons__right">
+            <div class="app__absolute__wrap__icons__right__circle">
+              <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+        <div class="app__absolute__wrap__link">
+          <div class="app__absolute__wrap__link__wrap">
+            <div class="app__absolute__wrap__link__wrap__link">
+              <input
+                type="text"
+                class="app__absolute__wrap__link__wrap__link__input"
+                value="http://localhost:8080/watch/1"
+              />
+            </div>
+            <div class="app__absolute__wrap__link__wrap__text">COPY</div>
+          </div>
+        </div>
+        <div class="app__absolute__wrap__start">
+          <div class="app__absolute__wrap__start__left">
+            <input
+              type="checkbox"
+              id="checkBoxStartAt"
+              name="checkBoxStartAt"
+              class="app__absolute__wrap__start__left__checkbox"
+            />
+          </div>
+          <div class="app__absolute__wrap__start__text">
+            <div class="app__absolute__wrap__start__text__start">Start at</div>
+            <input
+              type="text"
+              class="app__absolute__wrap__start__text__input"
+              value="3:54"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="app__absolute" v-if="showSave">
+      <div class="app__absolute__save">
+        <div class="app__absolute__save__head">
+          <div class="app__absolute__save__head__text">Save to...</div>
+          <div class="app__absolute__save__head__close" @click="switchShowSave">
+            <i class="fas fa-times"></i>
+          </div>
+        </div>
+        <div class="app__absolute__save__playlists">
+          <div class="app__absolute__save__playlistst__list">
+            <div class="app__absolute__save__playlistst__list__input">
+              <template v-if="watchLater.videoCheck">
+                <input
+                  type="checkbox"
+                  checked
+                  class="app__absolute__save__playlistst__list__input__checkbox"
+                  @click="clickToRemoveVideoFromWatchLater"
+                />
+              </template>
+              <template v-if="!watchLater.videoCheck">
+                <input
+                  @click="clickToAddVideoToWatchLater"
+                  type="checkbox"
+                  class="app__absolute__save__playlistst__list__input__checkbox"
+                />
+              </template>
+            </div>
+            <div class="app__absolute__save__playlistst__list__text">
+              Water later
+            </div>
+            <div class="app__absolute__save__playlistst__list__icon">
+              <i class="fas fa-lock"></i>
+            </div>
+          </div>
+
+          <template v-for="playlist in playlists" :key="playlist.id">
+            <div class="app__absolute__save__playlistst__list">
+              <div class="app__absolute__save__playlistst__list__input">
+                <template v-if="playlist.videoCheck == true">
+                  <input
+                    type="checkbox"
+                    checked
+                    class="app__absolute__save__playlistst__list__input__checkbox"
+                    @click="clickToRemoveVideoFromPlaylist(playlist.id)"
+                  />
+                </template>
+                <template v-if="playlist.videoCheck == false">
+                  <input
+                    type="checkbox"
+                    class="app__absolute__save__playlistst__list__input__checkbox"
+                    @click="clickToAddVideoToPlaylist(playlist.id)"
+                  />
+                </template>
+              </div>
+              <div class="app__absolute__save__playlistst__list__text">
+                {{ playlist.name }}
+              </div>
+              <div class="app__absolute__save__playlistst__list__icon">
+                <i class="fas fa-globe-asia"></i>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div class="app__absolute__save__newPlaylist" v-if="newPlaylist">
+          <div class="app__absolute__save__newPlaylist__text">Name</div>
+          <input
+            type="text"
+            class="app__absolute__save__newPlaylist__input"
+            placeholder="Enter playlist name..."
+            v-model="newPlaylistName"
+          />
+          <button
+            class="app__absolute__save__newPlaylist__button"
+            @click="createANewPlaylist"
+          >
+            CREATE
+          </button>
+        </div>
+        <div
+          class="app__absolute__save__createNewPlaylist"
+          v-if="newPlaylist == false"
+        >
+          <div class="app__absolute__save__createNewPlaylist__icon">
+            <i class="fas fa-plus"></i>
+          </div>
+          <div
+            class="app__absolute__save__createNewPlaylist__text"
+            @click="newPlaylist = true"
+          >
+            Create new playlist
+          </div>
+        </div>
+      </div>
+    </div>
     <StudioNavbar v-if="currentRoute == '/studio'" />
     <NavBar
       v-else
@@ -11,7 +193,7 @@
       v-if="!expanded"
       :class="[
         showLeftNav ? 'left__nav' : 'left__nav  left__nav__none',
-        currentRoute == '/fashion' ? 'left__nav--black' : 'left__nav',
+        currentRoute == '/fashion' ? 'left__nav--black' : '',
         currentRoute == '/setting' ? 'left__nav__none' : '',
         currentRoute == '/watch' ? 'left__nav__none' : '',
         currentRoute == '/studio' ? 'left__nav__none' : ''
@@ -162,7 +344,7 @@
           </svg>
           <div
             class="left__nav__expand__playlists__list__text"
-            @click="goToPlaylist"
+            @click="goToStudio"
           >
             Your Videos
           </div>
@@ -173,133 +355,84 @@
           </div>
           <div
             class="left__nav__expand__playlists__list__text"
-            @click="goToPlaylist"
+            @click="goToWatchLater"
           >
             Watch later
           </div>
         </div>
-        <div class="left__nav__expand__playlists__list">
-          <svg class="left__nav__expand__playlists__list__svg">
-            <path d="M 0 3 L 25 3" class="svg__grey--nofill--4px" />
-            <path d="M 0 12 L 25 12" class="svg__grey--nofill--4px" />
-            <path d="M 0 20 L 15 20" class="svg__grey--nofill--4px" />
-            <path d="M17 15 L 17 25 L 25 20 Z" class="svg__grey" />
-          </svg>
-          <div
-            class="left__nav__expand__playlists__list__text"
-            @click="goToPlaylist"
-          >
-            JavaScript
-          </div>
-        </div>
-        <div class="left__nav__expand__playlists__list">
+        <template v-for="(playlist, index) in playlists" :key="playlist.id">
+          <template v-if="index == 0">
+            <div class="left__nav__expand__playlists__list">
+              <svg class="left__nav__expand__playlists__list__svg">
+                <path d="M 0 3 L 25 3" class="svg__grey--nofill--4px" />
+                <path d="M 0 12 L 25 12" class="svg__grey--nofill--4px" />
+                <path d="M 0 20 L 15 20" class="svg__grey--nofill--4px" />
+                <path d="M17 15 L 17 25 L 25 20 Z" class="svg__grey" />
+              </svg>
+              <div
+                class="left__nav__expand__playlists__list__text"
+                @click="goToPlaylist(playlist.id)"
+              >
+                {{ playlist.name }}
+              </div>
+            </div>
+          </template>
+          <template v-if="index != 0">
+            <template v-if="extendedPlaylist">
+              <div class="left__nav__expand__playlists__list">
+                <svg class="left__nav__expand__playlists__list__svg">
+                  <path d="M 0 3 L 25 3" class="svg__grey--nofill--4px" />
+                  <path d="M 0 12 L 25 12" class="svg__grey--nofill--4px" />
+                  <path d="M 0 20 L 15 20" class="svg__grey--nofill--4px" />
+                  <path d="M17 15 L 17 25 L 25 20 Z" class="svg__grey" />
+                </svg>
+                <div
+                  class="left__nav__expand__playlists__list__text"
+                  @click="goToPlaylist(playlist.id)"
+                >
+                  {{ playlist.name }}
+                </div>
+              </div>
+            </template>
+          </template>
+        </template>
+
+        <div
+          class="left__nav__expand__playlists__list"
+          @click="extendedPlaylist = !extendedPlaylist"
+          v-if="playlists.length > 1"
+        >
           <div class="left__nav__expand__playlists__list__svg">
             <i class="fas fa-angle-down"></i>
           </div>
-          <div class="left__nav__expand__playlists__list__text">Show more</div>
+          <div class="left__nav__expand__playlists__list__text">
+            {{ extendedPlaylist ? "Show less" : "Show more" }}
+          </div>
         </div>
       </div>
       <div class="left__nav__expand__subscriptions">
         <div class="left__nav__expand__subscriptions__text">SUBSCRIPTIONS</div>
-        <div
-          class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
+        <template
+          v-for="subscription in user.subscribeChannel"
+          :key="subscription.id"
         >
-          <img
-            :src="profile"
-            class="left__nav__expand__subscriptions__channel__profile"
-          />
-          <div class="left__nav__expand__subscriptions__channel__name">
-            REdi
+          <div
+            class="left__nav__expand__subscriptions__channel"
+            @click="goToChannel(subscription.id)"
+          >
+            <img
+              :src="profile"
+              class="left__nav__expand__subscriptions__channel__profile"
+            />
+            <div class="left__nav__expand__subscriptions__channel__name">
+              {{ subscription.userName }}
+            </div>
           </div>
-        </div>
+        </template>
+
         <div
+          v-if="user.subscribeChannel.length > 5"
           class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
-        >
-          <img
-            :src="profile"
-            class="left__nav__expand__subscriptions__channel__profile"
-          />
-          <div class="left__nav__expand__subscriptions__channel__name">
-            REdi
-          </div>
-        </div>
-        <div
-          class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
-        >
-          <img
-            :src="profile"
-            class="left__nav__expand__subscriptions__channel__profile"
-          />
-          <div class="left__nav__expand__subscriptions__channel__name">
-            REdi
-          </div>
-        </div>
-        <div
-          class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
-        >
-          <img
-            :src="profile"
-            class="left__nav__expand__subscriptions__channel__profile"
-          />
-          <div class="left__nav__expand__subscriptions__channel__name">
-            REdi
-          </div>
-        </div>
-        <div
-          class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
-        >
-          <img
-            :src="profile"
-            class="left__nav__expand__subscriptions__channel__profile"
-          />
-          <div class="left__nav__expand__subscriptions__channel__name">
-            REdi
-          </div>
-        </div>
-        <div
-          class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
-        >
-          <img
-            :src="profile"
-            class="left__nav__expand__subscriptions__channel__profile"
-          />
-          <div class="left__nav__expand__subscriptions__channel__name">
-            REdi
-          </div>
-        </div>
-        <div
-          class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
-        >
-          <img
-            :src="profile"
-            class="left__nav__expand__subscriptions__channel__profile"
-          />
-          <div class="left__nav__expand__subscriptions__channel__name">
-            REdi
-          </div>
-        </div>
-        <div
-          class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
-        >
-          <img
-            :src="profile"
-            class="left__nav__expand__subscriptions__channel__profile"
-          />
-          <div class="left__nav__expand__subscriptions__channel__name">
-            REdi
-          </div>
-        </div>
-        <div
-          class="left__nav__expand__subscriptions__channel"
-          @click="goToChannel"
         >
           <div class="left__nav__expand__subscriptions__channel__svg">
             <i class="fas fa-angle-down"></i>
@@ -562,7 +695,6 @@
     <div
       :class="[
         currentRoute == '/setting' ? 'app__component--100' : '',
-        currentRoute == '/studio' ? 'app__component--100' : '',
         expanded
           ? 'app__component--expand'
           : showLeftNav
@@ -583,7 +715,12 @@
         ]"
       >
         <div :style="{ width: exactWidth + 'px' }">
-          <router-view />
+          <router-view
+            :switchShowShare="switchShowShare"
+            :switchShowSave="switchShowSave"
+            :giveAppParamsInfo="giveAppParamsInfo"
+            :changeCurrentRoute="changeCurrentRoute"
+          />
         </div>
       </div>
     </div>
@@ -681,8 +818,10 @@ import NavBar from "@/components/NavBar.vue";
 import Modal from "@/components/Modal.vue";
 import profile from "@/assets/profile.png";
 import StudioNavbar from "@/components/StudioNavbar.vue";
+import EventService from "@/services/EventService.js";
 
 import { onMounted, reactive, toRefs } from "vue";
+
 export default {
   name: "App",
   components: {
@@ -701,8 +840,393 @@ export default {
       displayHelp: false,
       exactWidth: 483,
       minusThisForWidth: 72,
-      viewportWidth: 1900
+      viewportWidth: 1900,
+      showShare: false,
+      showSave: false,
+      playlists: [],
+      user: [],
+      extendedPlaylist: false,
+      paramsInfo: [],
+      watchLater: [],
+      watchLaterVideo: null,
+      newPlaylist: false,
+      newPlaylistName: ""
     });
+
+    const changeCurrentRoute = route => {
+      state.currentRoute = route;
+    };
+
+    const giveAppParamsInfo = info => {
+      state.paramsInfo = info;
+      console.log(state.paramsInfo, "info");
+    };
+
+    EventService.getUser(1).then(response => {
+      state.user = response.data;
+      state.watchLater = response.data.watchLater;
+      state.playlists = response.data.playlists;
+
+      if (state.paramsInfo[0] || state.paramsInfo[2]) {
+        checkIfVideoInWatchLater();
+      }
+
+      //console.log("playlists", state.playlists);
+    });
+
+    const createANewPlaylist = () => {
+      //
+      let newPlaylist = {
+        id: Math.floor(Math.random() * 1000000),
+        name: state.newPlaylistName,
+        thumbnail: "jungle.jpg",
+        creator: "REdi",
+        creatorId: 1,
+        videoCheck: false,
+        description:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sollicitudin efficitur leo et gravida. Nulla sit amet tellus a enim commodo rhoncus et sit amet tellus.",
+        videos: []
+      };
+
+      state.playlists.push(newPlaylist);
+      state.user.playlists = state.playlists;
+      EventService.putUser(1, state.user);
+      state.newPlaylist = false;
+    };
+
+    const switchShowShare = () => {
+      state.showShare = !state.showShare;
+    };
+    const switchShowSave = () => {
+      if (!state.showSave) {
+        //console.log("hey prepare to check!");
+        state.showSave = !state.showSave;
+        //if false, that mean we are opening it up
+        //check if the id of this video is in any of the playlist
+        console.log(state.paramsInfo);
+        let currentVideoId;
+        if (state.paramsInfo[0] != "") {
+          console.log("inside ParamINfo Check! passed");
+          //
+          //console.log("check plyalistId passed!");
+          //find the video first
+          for (let i = 0; i < state.playlists.length; i++) {
+            console.log("loop check 1");
+            if (state.playlists[i].id == state.paramsInfo[0]) {
+              //found the playlist
+              console.log("loop check 2");
+              for (let j = 0; j < state.playlists[i].videos.length; j++) {
+                console.log("loop check 3");
+                if (j + 1 == state.paramsInfo[1]) {
+                  console.log("check 4, passed!");
+                  currentVideoId = state.playlists[i].videos[j].id;
+                  break;
+                }
+              }
+            }
+          }
+          console.log("continue; break out!", currentVideoId);
+          //after that, that mean we have the videoId
+          //so loop through all playlists, and then if we found the same id in that playlists,
+          //we check that
+          let found;
+          for (let i = 0; i < state.playlists.length; i++) {
+            console.log("true check 1");
+            for (let j = 0; j < state.playlists[i].videos.length; j++) {
+              console.log("true check 2");
+              if (state.playlists[i].videos[j].id == currentVideoId) {
+                found = true;
+                //console.log("checked!");
+                state.playlists[i].videoCheck = true;
+              }
+            }
+            if (!found) {
+              state.playlists[i].videoCheck = false;
+              found = false;
+            }
+          }
+        } else {
+          console.log("check playlist failed!", state.paramsInfo[2]);
+          let found = false;
+          for (let i = 0; i < state.playlists.length; i++) {
+            console.log("playlist:", i);
+            if (state.playlists[i].videos.length > 0) {
+              for (let j = 0; j < state.playlists[i].videos.length; j++) {
+                console.log(
+                  "comparing:",
+                  state.playlists[i].videos[j].id,
+                  state.paramsInfo[2]
+                );
+                if (state.playlists[i].videos[j].id == state.paramsInfo[2]) {
+                  console.log("checked!!");
+                  found = true;
+                  state.playlists[i].videoCheck = true;
+                }
+              }
+            } else {
+              found = false;
+            }
+
+            if (found == false) {
+              console.log("false");
+              state.playlists[i].videoCheck = false;
+              found = false;
+            }
+          }
+        }
+      } else {
+        //we are closing, don't matter
+        state.showSave = !state.showSave;
+      }
+    };
+
+    const clickToAddVideoToPlaylist = playlistId => {
+      //
+      //found song in the playlist that trying to add to?
+
+      //let loop through the playlist to find this playlist
+      console.log("CLick Add this video!", playlistId);
+      let currentVideoId;
+      if (state.paramsInfo[0]) {
+        for (let i = 0; i < state.playlists.length; i++) {
+          if (state.playlists[i].id == state.paramsInfo[0]) {
+            //found playlist
+            //found song yet?
+
+            for (let j = 0; j < state.playlists[i].videos.length; j++) {
+              //
+
+              if (state.paramsInfo[1]) {
+                //this use index
+
+                if (j + 1 == state.paramsInfo[1]) {
+                  //found song
+
+                  currentVideoId = state.playlists[i].videos[j].id;
+                }
+              }
+            }
+          }
+
+          if (currentVideoId) {
+            EventService.getVideoId(currentVideoId).then(response => {
+              //go through playlist and find the playlistId
+              for (let i = 0; i < state.playlists.length; i++) {
+                if (state.playlists[i].id == playlistId) {
+                  //
+                  state.playlists[i].videos.push(response.data);
+                }
+              }
+              state.user.playlists = state.playlists;
+              //create a temp playlist and run through the check to make sure that it's all false before send it back
+
+              EventService.putUser(1, state.user);
+            });
+          }
+        }
+      } else if (state.paramsInfo[2]) {
+        //just add them
+        EventService.getVideoId(Number(state.paramsInfo[2])).then(response => {
+          //go through playlist and find the playlistId
+          for (let i = 0; i < state.playlists.length; i++) {
+            if (state.playlists[i].id == playlistId) {
+              //
+              state.playlists[i].videos.push(response.data);
+            }
+          }
+          state.user.playlists = state.playlists;
+          //create a temp playlist and run through the check to make sure that it's all false before send it back
+
+          EventService.putUser(1, state.user);
+        });
+      }
+    };
+
+    const clickToRemoveVideoFromPlaylist = playlistId => {
+      console.log("CLick Remove this video!");
+
+      for (let i = 0; i < state.playlists.length; i++) {
+        if (state.playlists[i].id == playlistId) {
+          //found the playlist
+          for (let j = 0; j < state.playlists[i].videos.length; j++) {
+            //
+            if (state.paramsInfo[1].length > 0) {
+              //this use index
+              if (j + 1 == state.paramsInfo[1]) {
+                state.playlists[i].videos.splice(j, 1);
+
+                state.playlists[i].videoCheck = false;
+                state.user.playlists = state.playlists;
+
+                EventService.putUser(1, state.user);
+                if (state.playlists[i].videos.length == 0) {
+                  console.log("check!");
+                  window.location.href = "/";
+                }
+              }
+            } else if (state.paramsInfo[2]) {
+              //this use videoId
+              if (state.playlists[i].videos[j].id == state.paramsInfo[2]) {
+                state.playlists[i].videos.splice(j, 1);
+                state.playlists[i].videoCheck = false;
+                state.user.playlists = state.playlists;
+
+                EventService.putUser(1, state.user);
+                if (state.playlists[i].videos.length == 0) {
+                  console.log("check!");
+                  window.location.href = "/";
+                }
+              }
+            }
+          }
+        }
+      }
+      console.log(playlistId);
+    };
+
+    const checkIfVideoInWatchLater = () => {
+      //go to
+      //go through watch later, to find the video id, is it there?
+      //if yes, display
+
+      //get videoId
+      //console.log("start checking WatchLater");
+      let videoId;
+      if (state.paramsInfo[0].length > 0) {
+        //console.log("go through first iteration");
+        //playlist
+        //console.log("state.playlists:", state.playlists);
+        for (let i = 0; i < state.playlists.length; i++) {
+          //console.log("comparing:", state.playlists[i].id, state.paramsInfo[0]);
+          if (state.playlists[i].id == state.paramsInfo[0]) {
+            //found here the playlist
+            //console.log("found playlist");
+            for (let j = 0; j < state.playlists[i].videos.length; j++) {
+              if (j + 1 == state.paramsInfo[1]) {
+                //foound the dang video
+                //console.log("found video ID");
+                videoId = state.playlists[i].videos[j].id;
+                state.watchLaterVideo = state.playlists[i].videos[j];
+              }
+            }
+          }
+        }
+        //check water later
+      } else if (state.paramsInfo[2]) {
+        //we have videoId
+        //console.log("we have videoId!");
+        for (let i = 0; i < state.watchLater.videos.length; i++) {
+          if (state.watchLater.videos[i].id == state.paramsInfo[2]) {
+            //
+            //console.log("found it!");
+            state.watchLater.videoCheck = true;
+            state.watchLaterVideo = state.watchLater.videos[i];
+          }
+        }
+      }
+
+      //we got the videoId
+      if (videoId) {
+        //console.log("videoId:", videoId);
+        for (let i = 0; i < state.watchLater.videos.length; i++) {
+          if (state.watchLater.videos[i].id == videoId) {
+            //
+            //console.log("found it!2");
+            state.watchLaterVideo = state.watchLater.videos[i];
+            state.watchLater.videoCheck = true;
+          }
+        }
+      }
+    };
+
+    const clickToAddVideoToWatchLater = () => {
+      //check if video is in the watchLater
+      //by checking the videoCheck to true
+      if (!state.watchLater.videoCheckk) {
+        //if false, it's not in there
+        //now get that video and add it to watchLater, and add that to user and call to API to make change
+        if (state.watchLaterVideo) {
+          //we have the video ready
+          state.watchLater.push(state.watchLaterVideo);
+          state.user.watchLater = state.watchLater;
+          EventService.putUser(1, state.user);
+        } else if (!state.watchLaterVideo) {
+          //we do not have video yet
+          //let;s get it
+          if (state.paramsInfo[2]) {
+            EventService.getVideoId(state.paramsInfo[2]).then(response => {
+              //make change and call to API to make change
+              state.watchLater.videos.push(response.data);
+              state.user.watchLater = state.watchLater;
+              EventService.putUser(1, state.user);
+            });
+          } else if (state.paramsInfo[1]) {
+            //if we don't have videoID but we have index instead because we are viewing this from our playlist
+            //go through playlist, find the index, then get the video and then make change
+            for (let i = 0; i < state.playlists.length; i++) {
+              if (state.playlists[i].id == state.paramsInfo[0]) {
+                for (let j = 0; j < state.playlists[i].videos.length; j++) {
+                  if (j + 1 == state.paramsInfo[1]) {
+                    //we found it
+                    state.watchLater.videos.push(state.playlists[i].videos[j]);
+                    state.user.watchLater = state.watchLater;
+                    EventService.putUser(1, state.user);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const clickToRemoveVideoFromWatchLater = () => {
+      //step 1: is the video part of a playlist?
+      //consider yes:
+      //find that video first
+      //then
+      //loop through watchLater, and remove it
+      //consider: no
+      //then we must have videoId
+      //now go through the watchLater and find the video and remove it
+      //update to the API data
+      console.log(state.paramsInfo);
+      //console.log("Remove video!");
+      let videoId;
+      if (state.paramsInfo[0].length > 0) {
+        for (let i = 0; i < state.playlists.length; i++) {
+          if (state.playlists[i].id == state.paramsInfo[0]) {
+            for (let j = 0; j < state.playlists[i].videos.length; j++) {
+              if (j + 1 == state.paramsInfo[1]) {
+                //
+                videoId = state.playlists[i].videos[j].id;
+              }
+            }
+          }
+        }
+      } else if (state.paramsInfo[2].length) {
+        //we have the id, not part of any playlist
+        for (let i = 0; i < state.watchLater.videos.length; i++) {
+          if (state.watchLater.videos[i].id == state.paramsInfo[2]) {
+            state.watchLater.videos.splice(i, 1);
+            state.watchLater.videoCheck = false;
+            state.user.watchLater = state.watchLater;
+            EventService.putUser(1, state.user);
+          }
+        }
+      }
+      if (videoId) {
+        for (let i = 0; i < state.watchLater.videos.length; i++) {
+          if (state.watchLater.videos[i].id == videoId) {
+            //console.log("removing!");
+            state.watchLater.videos.splice(i, 1);
+            state.watchLater.videoCheck = false;
+            state.user.watchLater = state.watchLater;
+            EventService.putUser(1, state.user);
+          }
+        }
+      }
+    };
 
     const findExactWidth = () => {
       window.addEventListener("resize", function() {
@@ -727,7 +1251,7 @@ export default {
 
     //we want the expand nav to be fixed on watch page and not moving page around
     const determineToGetExactWidthOrNotBaseOnPageRoute = () => {
-      console.log("did this ahppen?");
+      //console.log("did this ahppen?");
       if (state.currentRoute == "/watch") {
         //exact width
         state.exactWidth = document.documentElement.clientWidth;
@@ -738,9 +1262,6 @@ export default {
     };
 
     onMounted(() => {
-      //check route
-      state.currentRoute = window.location.pathname;
-
       //first load, make sure page is set up properly
       let viewWidth = document.documentElement.clientWidth;
 
@@ -878,13 +1399,13 @@ export default {
       window.location.href = "/history";
     };
     const goToWatchLater = () => {
-      window.location.href = "/playlist";
+      window.location.href = "/library";
     };
-    const goToPlaylist = () => {
-      window.location.href = "/playlist";
+    const goToPlaylist = id => {
+      window.location.href = "/playlist/" + id;
     };
-    const goToChannel = () => {
-      window.location.href = "/channel/dfdf";
+    const goToChannel = id => {
+      window.location.href = "/channel/" + id;
     };
     const goToPremium = () => {
       window.location.href = "/premium";
@@ -909,6 +1430,10 @@ export default {
     };
     const goToSettings = () => {
       window.location.href = "/setting";
+    };
+
+    const goToStudio = () => {
+      window.location.href = "/studio";
     };
 
     const showHelp = () => {
@@ -943,6 +1468,7 @@ export default {
 
     return {
       ...toRefs(state),
+      giveAppParamsInfo,
       switchModal,
       goHome,
       goToTrending,
@@ -965,7 +1491,16 @@ export default {
       goToFashion,
       goToLearning,
       goToSports,
-      goToSettings
+      goToSettings,
+      goToStudio,
+      switchShowShare,
+      switchShowSave,
+      clickToAddVideoToPlaylist,
+      clickToRemoveVideoFromPlaylist,
+      clickToAddVideoToWatchLater,
+      clickToRemoveVideoFromWatchLater,
+      createANewPlaylist,
+      changeCurrentRoute
     };
   }
 };
@@ -978,7 +1513,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #272829;
+  position: relative;
 }
 
 body {
@@ -987,6 +1523,363 @@ body {
   box-sizing: border-box;
   position: relative;
   overflow-x: hidden;
+}
+
+.app__absolute {
+  position: fixed;
+  background-color: rgba(39, 39, 39, 0.5);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+.app__absolute__wrap {
+  width: 500px;
+  height: 330px;
+  background-color: white;
+}
+.app__absolute__wrap__head {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-family: Roboto, Arial, sans-serif;
+}
+.app__absolute__wrap__head:hover {
+  cursor: pointer;
+}
+.app__absolute__wrap__head__title {
+  margin-left: 25px;
+  font-size: 1.2rem;
+}
+.app__absolute__wrap__head__close {
+  margin-right: 25px;
+}
+.app__absolute__wrap__head__close .fa-times {
+  font-size: 1.5rem;
+}
+.app__absolute__wrap__icons {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+.app__absolute__wrap__icons__left {
+  width: 10%;
+  height: 80%;
+  position: relative;
+}
+.app__absolute__wrap__icons__left__circle {
+  position: absolute;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  margin-left: 55%;
+  margin-top: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  box-shadow: 0 0 5px grey;
+  display: none;
+}
+.app__absolute__wrap__icons__left__circle:hover {
+  cursor: pointer;
+}
+.app__absolute__wrap__icons__content {
+  width: 80%;
+  height: 80%;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -ms-overflow-style: none; /*IE*/
+  scrollbar-width: none; /*firefox*/
+  scroll-behavior: smooth;
+
+  white-space: nowrap;
+}
+/*chrome, safari*/
+.app__absolute__wrap__icons__content::-webkit-scrollbar {
+  display: none;
+}
+
+.app__absolute__wrap__icons__content__circle {
+  width: 60px;
+  height: 60px;
+  margin: 5px 10px;
+  display: inline-block;
+  border-radius: 50%;
+  background-color: white;
+  line-height: 110px;
+}
+.app__absolute__wrap__icons__content__circle:first-child {
+  margin-left: 0;
+}
+.app__absolute__wrap__icons__content__circle:last-child {
+  margin-right: 0;
+}
+.app__absolute__wrap__icons__content__circle--twitter {
+  background-color: dodgerblue;
+}
+.app__absolute__wrap__icons__content__circle--gmail {
+  background-color: rgb(180, 180, 180);
+}
+.app__absolute__wrap__icons__content__circle--reddit {
+  background-color: rgb(211, 57, 46);
+}
+.app__absolute__wrap__icons__content__circle--linkedin {
+  background-color: rgb(24, 113, 202);
+}
+.app__absolute__wrap__icons__content__circle--embed {
+  background-color: rgb(235, 235, 235);
+}
+.app__absolute__wrap__icons__content__circle .fa-twitter {
+  color: white;
+  line-height: 60px;
+  font-size: 1.8rem;
+}
+.app__absolute__wrap__icons__content__circle .fa-envelope {
+  color: white;
+  line-height: 60px;
+  font-size: 1.8rem;
+}
+.app__absolute__wrap__icons__content__circle .fa-reddit-alien {
+  color: white;
+  line-height: 60px;
+  font-size: 1.8rem;
+}
+.app__absolute__wrap__icons__content__circle .fa-linkedin-in {
+  color: white;
+  line-height: 60px;
+  font-size: 1.8rem;
+}
+.app__absolute__wrap__icons__content__circle .fa-code {
+  color: rgb(112, 111, 111);
+  line-height: 60px;
+  font-size: 1.8rem;
+}
+.app__absolute__wrap__icons__right {
+  width: 10%;
+  height: 80%;
+  position: relative;
+}
+.app__absolute__wrap__icons__right__circle {
+  position: absolute;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  margin-left: -45%;
+  margin-top: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  box-shadow: 0 0 5px grey;
+  display: none;
+}
+.app__absolute__wrap__icons__right__circle:hover {
+  cursor: pointer;
+}
+.app__absolute__wrap__link {
+  width: 90%;
+  height: 80px;
+  margin: 25px auto 10px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  border-radius: 2px;
+  border-bottom: 1px solid lightgrey;
+}
+.app__absolute__wrap__link__wrap {
+  width: 100%;
+  height: 50%;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  background-color: rgb(236, 236, 236);
+}
+
+.app__absolute__wrap__link__wrap__link {
+  width: 80%;
+  height: 50%;
+}
+.app__absolute__wrap__link__wrap__link__input {
+  width: 90%;
+  background-color: rgb(236, 236, 236);
+  border: unset;
+}
+.app__absolute__wrap__link__wrap__text {
+  width: 20%;
+  height: 100%;
+  line-height: 40px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: dodgerblue;
+  font-family: Roboto, Arial, sans-serif;
+}
+.app__absolute__wrap__link__wrap__text:hover {
+  cursor: pointer;
+}
+
+.app__absolute__wrap__start {
+  width: 90%;
+  height: 50px;
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 0 auto;
+}
+.app__absolute__wrap__start__left {
+  width: 20px;
+  height: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+.app__absolute__wrap__start__left__checkbox {
+  transform: scale(1.3);
+}
+.app__absolute__wrap__start__text {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+.app__absolute__wrap__start__text__start {
+  margin-left: 10px;
+}
+.app__absolute__wrap__start__text__input {
+  max-width: 55px;
+  margin-left: 5px;
+  border: unset;
+  border-bottom: 2px solid black;
+}
+.app__absolute__wrap__start__text__input:focus {
+  outline: unset;
+}
+
+.app__absolute__save {
+  width: 230px;
+  min-height: 400px;
+  background-color: white;
+  font-family: Roboto, Arial, sans-serif;
+}
+.app__absolute__save__head {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+.app__absolute__save__head__text {
+  margin-left: 22px;
+  font-size: 1.1rem;
+}
+.app__absolute__save__head__close {
+  margin-right: 15px;
+}
+.app__absolute__save__head__close:hover {
+  cursor: pointer;
+}
+.app__absolute__save__head__close .fa-times {
+  font-size: 1.3rem;
+}
+.app__absolute__save__playlists {
+  width: 100%;
+  height: 300px;
+  overflow-y: auto;
+}
+
+.app__absolute__save__playlistst__list {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+.app__absolute__save__playlistst__list__input {
+  width: 30%;
+}
+.app__absolute__save__playlistst__list__input__checkbox {
+  transform: scale(1.5);
+}
+.app__absolute__save__playlistst__list__text {
+  width: 50%;
+  text-align: left;
+  font-size: 0.9rem;
+}
+.app__absolute__save__playlistst__list__icon {
+  width: 20%;
+}
+.app__absolute__save__playlistst__list__icon .fa-lock,
+.app__absolute__save__playlistst__list__icon .fa-globe-asia {
+  font-size: 0.9rem;
+}
+
+.app__absolute__save__newPlaylist {
+  width: 100%;
+}
+.app__absolute__save__newPlaylist__text {
+  width: 100%;
+  text-align: left;
+  font-size: 0.9rem;
+  text-indent: 5px;
+}
+.app__absolute__save__newPlaylist__input {
+  width: 95%;
+  height: 25px;
+  text-align: left;
+  border: unset;
+  border-bottom: 2px solid black;
+}
+.app__absolute__save__newPlaylist__input:focus {
+  outline: unset;
+}
+.app__absolute__save__newPlaylist__button {
+  float: right;
+  padding: 0.5rem 1rem;
+  right: 0;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border: unset;
+  color: dodgerblue;
+  font-weight: 500;
+  background-color: white;
+  font-size: 0.9rem;
+  font-family: Roboto, Arial, sans-serif;
+}
+.app__absolute__save__newPlaylist__button:hover {
+  cursor: pointer;
+}
+
+.app__absolute__save__createNewPlaylist {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+.app__absolute__save__createNewPlaylist:hover {
+  cursor: pointer;
+  background-color: lightgrey;
+}
+.app__absolute__save__createNewPlaylist__icon {
+  width: 30%;
+  text-align: center;
+}
+.app__absolute__save__createNewPlaylist__text {
+  width: 70%;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: black;
 }
 
 .app__component__help {
@@ -1217,6 +2110,7 @@ body {
 .app__component {
   width: 100%;
   height: 100%;
+  background-color: white;
 }
 
 .app_component--height {
@@ -1371,6 +2265,7 @@ body {
   width: 25px;
   height: 25px;
   text-align: center;
+  transform: scale(0.8);
 }
 .left__nav__expand__goPlace__button__text {
   width: 70%;
@@ -1407,11 +2302,15 @@ body {
   width: 25px;
   height: 25px;
   text-align: center;
+  transform: scale(0.8);
 }
 .left__nav__expand__playlists__list__text {
   width: 70%;
   height: 100%;
   line-height: 40px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .left__nav__expand__subscriptions {

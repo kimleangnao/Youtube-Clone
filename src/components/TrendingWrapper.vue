@@ -10,8 +10,14 @@
       ]"
     >
       <div class="TW_wrap__filter">
-        <div class="TW_wrap__filter__category">
-          <svg class="TW_wrap__filter__category__svg">
+        <div class="TW_wrap__filter__category" @click="filterToMusic">
+          <svg
+            :class="[
+              currentMusic
+                ? 'TW_wrap__filter__category__svg category--active'
+                : 'TW_wrap__filter__category__svg'
+            ]"
+          >
             <path
               d="M35 35 L 60 25 L 60 30 L 35 40"
               class="TW_wrap__filter__category__svg__white"
@@ -43,8 +49,14 @@
           </svg>
           <div class="TW_wrap__filter__category__text">Music</div>
         </div>
-        <div class="TW_wrap__filter__category">
-          <svg class="TW_wrap__filter__category__svg">
+        <div class="TW_wrap__filter__category" @click="filterToGame">
+          <svg
+            :class="[
+              currentGame
+                ? 'TW_wrap__filter__category__svg category--active'
+                : 'TW_wrap__filter__category__svg'
+            ]"
+          >
             <path
               d="M45 55 L 25 45 L 25 35 L 35 30 L 45 35 "
               class="TW_wrap__filter__category__svg__white"
@@ -76,8 +88,14 @@
           </svg>
           <div class="TW_wrap__filter__category__text">Gaming</div>
         </div>
-        <div class="TW_wrap__filter__category">
-          <svg class="TW_wrap__filter__category__svg">
+        <div class="TW_wrap__filter__category" @click="filterToNews">
+          <svg
+            :class="[
+              currentNews
+                ? 'TW_wrap__filter__category__svg category--active'
+                : 'TW_wrap__filter__category__svg'
+            ]"
+          >
             <path
               d="M25 25 L 25 65 L 53 65 L 65 55 L 65 25 Q 60 30, 55 25 Q 50 30, 45 25 
               Q 40 30, 35 25 Q 30 30, 25 25"
@@ -110,8 +128,14 @@
           </svg>
           <div class="TW_wrap__filter__category__text">News</div>
         </div>
-        <div class="TW_wrap__filter__category">
-          <svg class="TW_wrap__filter__category__svg">
+        <div class="TW_wrap__filter__category" @click="filterToMovies">
+          <svg
+            :class="[
+              currentMovies
+                ? 'TW_wrap__filter__category__svg category--active'
+                : 'TW_wrap__filter__category__svg'
+            ]"
+          >
             <rect
               width="50"
               height="32"
@@ -178,8 +202,17 @@
           </svg>
           <div class="TW_wrap__filter__category__text">Movies</div>
         </div>
-        <div class="TW_wrap__filter__category">
-          <svg class="TW_wrap__filter__category__svg">
+        <div
+          class="TW_wrap__filter__category"
+          @click="filterToFashionAndBeauty"
+        >
+          <svg
+            :class="[
+              currentFashionAndBeauty
+                ? 'TW_wrap__filter__category__svg category--active'
+                : 'TW_wrap__filter__category__svg'
+            ]"
+          >
             <path
               d="M25 50 L 65 50 L 45 38 Z"
               class="TW_wrap__filter__category__svg__white--nofill"
@@ -215,13 +248,25 @@
           <div class="TW_wrap__filter__category__text">Fashion & Beauty</div>
         </div>
       </div>
-      <div class="TW_wrap__result">
-        <TrendingVideo :myWidth="myWidth" />
-        <TrendingVideo :myWidth="myWidth" />
-        <TrendingVideo :myWidth="myWidth" />
-        <PromoteChannel :myWidth="myWidth" />
-        <TrendingVideo :myWidth="myWidth" />
-        <TrendingVideo :myWidth="myWidth" />
+      <div class="TW_wrap__result" v-for="video in videos" :key="video.id">
+        <template v-if="currentMusic == true && video.category == 'music'">
+          <TrendingVideo :video="video" :myWidth="myWidth" />
+        </template>
+        <template v-if="currentGame == true && video.category == 'game'">
+          <TrendingVideo :video="video" :myWidth="myWidth" />
+        </template>
+        <template v-if="currentNews == true && video.category == 'news'">
+          <TrendingVideo :video="video" :myWidth="myWidth" />
+        </template>
+        <template v-if="currentMovies == true && video.category == 'movie'">
+          <TrendingVideo :video="video" :myWidth="myWidth" />
+        </template>
+        <template
+          v-if="currentFashionAndBeauty == true && video.category == 'event'"
+        >
+          <TrendingVideo :video="video" :myWidth="myWidth" />
+        </template>
+        <!--<PromoteChannel :myWidth="myWidth" /> -->
       </div>
     </div>
   </div>
@@ -229,22 +274,74 @@
 
 <script>
 import TrendingVideo from "@/components/TrendingVideo.vue";
-import PromoteChannel from "@/components/PromoteChannel.vue";
+import { reactive, toRefs } from "vue";
+//import PromoteChannel from "@/components/PromoteChannel.vue";
 
 export default {
   name: "TrendingWrapper",
   components: {
-    TrendingVideo,
-    PromoteChannel
+    TrendingVideo
+    //PromoteChannel
   },
   props: {
     myWidth: {
       type: Number,
       required: true
-    }
+    },
+    videos: Array
   },
   setup() {
-    return {};
+    const state = reactive({
+      currentMusic: true,
+      currentGame: false,
+      currentNews: false,
+      currentMovies: false,
+      currentFashionAndBeauty: false
+    });
+    const filterToMusic = () => {
+      state.currentMusic = true;
+      state.currentGame = false;
+      state.currentNews = false;
+      state.currentMovies = false;
+      state.currentFashionAndBeauty = false;
+    };
+    const filterToGame = () => {
+      state.currentMusic = false;
+      state.currentGame = true;
+      state.currentNews = false;
+      state.currentMovies = false;
+      state.currentFashionAndBeauty = false;
+    };
+    const filterToNews = () => {
+      state.currentMusic = false;
+      state.currentGame = false;
+      state.currentNews = true;
+      state.currentMovies = false;
+      state.currentFashionAndBeauty = false;
+    };
+    const filterToMovies = () => {
+      state.currentMusic = false;
+      state.currentGame = false;
+      state.currentNews = false;
+      state.currentMovies = true;
+      state.currentFashionAndBeauty = false;
+    };
+    const filterToFashionAndBeauty = () => {
+      state.currentMusic = false;
+      state.currentGame = false;
+      state.currentNews = false;
+      state.currentMovies = false;
+      state.currentFashionAndBeauty = true;
+    };
+
+    return {
+      ...toRefs(state),
+      filterToMusic,
+      filterToGame,
+      filterToNews,
+      filterToMovies,
+      filterToFashionAndBeauty
+    };
   }
 };
 </script>
@@ -253,6 +350,7 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap");
 .TW {
   width: 100%;
+  height: 100%;
   margin-top: 60px;
 }
 .TW__wrap {
@@ -284,6 +382,9 @@ export default {
   border-radius: 50%;
   margin-top: 10px;
 }
+.category--active {
+  background-color: rgb(117, 212, 176);
+}
 .TW_wrap__filter__category__svg:hover {
   cursor: pointer;
 }
@@ -291,6 +392,7 @@ export default {
   fill: white;
   stroke: white;
 }
+
 .TW_wrap__filter__category__svg__white--nofill {
   fill: transparent;
   stroke: white;
@@ -301,6 +403,7 @@ export default {
   stroke: white;
   stroke-width: 1px;
 }
+
 .TW_wrap__filter__category__svg__lightgrey {
   fill: lightgrey;
   stroke: lightgrey;

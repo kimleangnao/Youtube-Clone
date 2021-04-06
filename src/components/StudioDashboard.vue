@@ -4,7 +4,10 @@
       <div class="studioDashboard__title__text">Channel dashboard</div>
       <div class="studioDashboard__title__actions">
         <div class="studioDashboard__title__actions__upload">
-          <svg class="studioDashboard__title__actions__upload__svg">
+          <svg
+            class="studioDashboard__title__actions__upload__svg"
+            @click="uploadSwitch"
+          >
             <path
               d="M20 29 L 12 29 L 12 30 L 28 30 L 28 29 L 20 29"
               class="svg__red"
@@ -41,7 +44,10 @@
             Want to see metrics on your recent video? Upload and publish a video
             to get started.
           </div>
-          <button class="studioDashboard__content__upload__inner__button">
+          <button
+            class="studioDashboard__content__upload__inner__button"
+            @click="uploadSwitch"
+          >
             UPLOADS VIDEOS
           </button>
         </div>
@@ -98,7 +104,10 @@
             Last 48 hours &bullet; Views
           </div>
         </div>
-        <div class="studioDashboard__content__analytics__goto">
+        <div
+          class="studioDashboard__content__analytics__goto"
+          @click="switchAnalytics"
+        >
           GO TO CHANNEL ANALYTICS
         </div>
       </div>
@@ -155,6 +164,16 @@ import uploadImage from "@/assets/camera-woman.png";
 
 export default {
   name: "StudioDashboard",
+  props: {
+    uploadSwitch: {
+      type: Function,
+      required: true
+    },
+    switchAnalytics: {
+      type: Function,
+      required: true
+    }
+  },
   setup() {
     return { uploadImage };
   }

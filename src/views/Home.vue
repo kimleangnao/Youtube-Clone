@@ -1,8 +1,6 @@
 <template>
   <div class="home">
-    <VideoWrapper :viewport="viewportWidth" title="" />
-    <VideoWrapper :viewport="viewportWidth" title="Trending" />
-    <VideoWrapper :viewport="viewportWidth" title="News" />
+    <VideoWrapper :videos="videos" :viewport="viewportWidth" title="" />
   </div>
 </template>
 
@@ -12,6 +10,8 @@
 import VideoWrapper from "@/components/VideoWrapper.vue";
 import { onMounted, reactive, toRefs } from "vue";
 
+import EventService from "@/services/EventService.js";
+
 export default {
   name: "Home",
   components: {
@@ -19,8 +19,17 @@ export default {
   },
   setup() {
     const state = reactive({
-      viewportWidth: 10
+      viewportWidth: 10,
+      videos: []
     });
+
+    EventService.getVideos()
+      .then(response => {
+        state.videos = response.data;
+      })
+      .catch(err => {
+        console.log("There was something wrong," + err);
+      });
 
     onMounted(() => {
       let viewWidth = document.documentElement.clientWidth;

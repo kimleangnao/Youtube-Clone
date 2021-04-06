@@ -1,8 +1,12 @@
 <template>
   <div class="playlist" @click="goToPlaylist">
-    <img :src="JS" alt="thumbnail" class="playlist__thumbnail" />
+    <img
+      :src="require('@/assets/' + playlist.thumbnail)"
+      alt="thumbnail"
+      class="playlist__thumbnail"
+    />
     <div class="playlist__cover">
-      <div class="playlist__cover__count">25</div>
+      <div class="playlist__cover__count">{{ playlist.videos.length }}</div>
       <svg class="playlist__cover__svg">
         <path
           d="M 0 2 L 25 2 L 25 4 L 0 4Z"
@@ -26,23 +30,28 @@
     </div>
     <div class="playlist__details">
       <div class="playlist__details__title">
-        JavaScript
+        {{ playlist.name }}
       </div>
-      <div class="playlist__details__madeBy">REdi</div>
+      <div class="playlist__details__madeBy">{{ playlist.creator }}</div>
       <div class="playlist__details__fullView">VIEW FULL PLAYLIST</div>
     </div>
   </div>
 </template>
 
 <script>
-import JS from "@/assets/JS.png";
 export default {
   name: "playlist",
-  setup() {
+  props: {
+    playlist: {
+      type: Object,
+      required: true
+    }
+  },
+  setup(props) {
     const goToPlaylist = () => {
-      window.location.href = "/playlist";
+      window.location.href = "/playlist/" + props.playlist.id;
     };
-    return { JS, goToPlaylist };
+    return { goToPlaylist };
   }
 };
 </script>

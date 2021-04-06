@@ -1,8 +1,10 @@
 <template>
   <div class="channelcomponent" @click="goToChannel">
     <img :src="profile" class="channelcomponent__channel" alt="profile image" />
-    <div class="channelcomponent__name">REdi</div>
-    <div class="channelcomponent__sub">20K subscriber</div>
+    <div class="channelcomponent__name">{{ channel.userName }}</div>
+    <div class="channelcomponent__sub">
+      {{ channel.subscriber }} Subscribers
+    </div>
     <div class="channelcomponent__subbutton">SUBSCRIBE</div>
   </div>
 </template>
@@ -11,9 +13,15 @@
 import profile from "@/assets/profile.png";
 export default {
   name: "Channel",
-  setup() {
+  props: {
+    channel: {
+      type: Object,
+      require: true
+    }
+  },
+  setup(props) {
     const goToChannel = () => {
-      window.location.href = "/channel/dfdf";
+      window.location.href = "/channel/" + props.channel.id;
     };
     return { profile, goToChannel };
   }
@@ -48,16 +56,17 @@ export default {
 }
 .channelcomponent__sub {
   font-size: 0.82rem;
-  color: rgb(155, 155, 155);
+  color: rgb(121, 121, 121);
 }
 .channelcomponent__subbutton {
   width: 100px;
-  height: 20px;
+  height: 22px;
   background-color: lightgrey;
-  color: rgb(94, 94, 94);
+  color: rgb(58, 58, 58);
   font-weight: 500;
+  font-size: 0.95rem;
   margin: 10px auto;
-  line-height: 20px;
+  line-height: 22px;
 }
 .channelcomponent__subbutton:hover {
   cursor: pointer;

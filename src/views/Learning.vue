@@ -22,6 +22,7 @@
       titleColor="black"
       title="Learning"
       :customizeProfile="true"
+      :goBackToSection="goBackToSection"
     >
       <svg class="learning__channel__svg">
         <circle cx="40" cy="35" r="20" class="svg__white" />
@@ -35,295 +36,81 @@
     </ChannelWrap>
   </div>
   <div class="learning__content">
-    <WrapComponent
-      :myWidth="viewportWidth"
-      title="Tips for Studying From Home"
-      subTitle="From room evironment setting to study methods, find the study tips that works best for you"
-      :nextButton="true"
-      :playall="false"
-      :viewall="false"
-    >
-      <template v-if="viewportWidth == 7">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 8">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 9">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 10">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-    </WrapComponent>
+    <template v-if="viewAll">
+      <WrapComponent
+        :myWidth="viewportWidth"
+        title="Helpful videos to keep you moving forwards"
+        subTitle="Enjoy "
+        :nextButton="false"
+        :playall="false"
+        :viewall="false"
+      >
+        <template v-for="video in videos" :key="video.id">
+          <PromoteVideo
+            :titleColor="false"
+            :channelColor="false"
+            :infoColor="false"
+            :video="video"
+            :userId="video.userId"
+          />
+        </template>
+      </WrapComponent>
+    </template>
+    <template v-if="!viewAll">
+      <WrapComponent
+        :myWidth="viewportWidth"
+        title="Tips for Studying From Home"
+        subTitle="From room evironment setting to study methods, find the study tips that works best for you"
+        :nextButton="false"
+        :playall="false"
+        :viewall="true"
+        :switchViewAll="switchAll"
+      >
+        <template v-for="tip in tips" :key="tip.id">
+          <PromoteVideo
+            :titleColor="false"
+            :channelColor="false"
+            :infoColor="false"
+            :video="tip"
+            :userId="tip.userId"
+          />
+        </template>
+      </WrapComponent>
 
-    <WrapComponent
-      :myWidth="viewportWidth"
-      title="CS50's Introduction to Game Development"
-      subTitle="Learning objectives This course picks up where Harvard University's CS50 leaves off, focusing on the development of 2D interactive games. Students explore the design of such childhood game as"
-      :nextButton="true"
-    >
-      <template v-if="viewportWidth == 7">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 8">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 9">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 10">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-    </WrapComponent>
+      <WrapComponent
+        :myWidth="viewportWidth"
+        title="CS50's Introduction to Game Development"
+        subTitle="Learning objectives This course picks up where Harvard University's CS50 leaves off, focusing on the development of 2D interactive games. Students explore the design of such childhood game as"
+        :nextButton="false"
+      >
+        <template v-for="video in CS50" :key="video.id">
+          <PromoteVideo
+            :titleColor="false"
+            :channelColor="false"
+            :infoColor="false"
+            :video="video"
+            :userId="video.userId"
+          />
+        </template>
+      </WrapComponent>
 
-    <WrapComponent
-      :myWidth="viewportWidth"
-      title="How much sleep do we really need?"
-      subTitle="Whether you sleep 4,6 or 8 hours a night, this playlist will help you determine what your body needs and why its important to keep yourself refreshed."
-      :nextButton="true"
-    >
-      <template v-if="viewportWidth == 7">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 8">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 9">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-      <template v-if="viewportWidth == 10">
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-        <PromoteVideo
-          :titleColor="false"
-          :channelColor="false"
-          :infoColor="false"
-        />
-      </template>
-    </WrapComponent>
+      <WrapComponent
+        :myWidth="viewportWidth"
+        title="How much sleep do we really need?"
+        subTitle="Whether you sleep 4,6 or 8 hours a night, this playlist will help you determine what your body needs and why its important to keep yourself refreshed."
+        :nextButton="false"
+      >
+        <template v-for="video in random" :key="video.id">
+          <PromoteVideo
+            :titleColor="false"
+            :channelColor="false"
+            :infoColor="false"
+            :video="video"
+            :userId="video.userId"
+          />
+        </template>
+      </WrapComponent>
+    </template>
   </div>
 </template>
 
@@ -331,6 +118,7 @@
 import ChannelWrap from "@/components/ChannelWrap.vue";
 import WrapComponent from "@/components/WrapComponent.vue";
 import PromoteVideo from "@/components/PromoteVideo.vue";
+import EventService from "@/services/EventService.js";
 
 import jungle from "@/assets/jungle.jpg";
 import { onMounted, reactive, toRefs } from "vue";
@@ -339,8 +127,32 @@ export default {
   components: { ChannelWrap, WrapComponent, PromoteVideo },
   setup() {
     const state = reactive({
+      viewAll: false,
       searchInputFocus: false,
-      viewportWidth: 10
+      viewportWidth: 10,
+      videos: [],
+      CS50: [],
+      random: [],
+      tips: []
+    });
+    EventService.getLearning().then(response => {
+      state.videos = response.data;
+      let random = [];
+      let CS50 = [];
+      let tips = [];
+      for (let i = 0; i < response.data.length; i++) {
+        //
+        if (response.data[i].category == "CS50") {
+          CS50.push(response.data[i]);
+        } else if (response.data[i].category == "tips") {
+          tips.push(response.data[i]);
+        } else if (response.data[i].category == "random") {
+          random.push(response.data[i]);
+        }
+      }
+      state.CS50 = CS50;
+      state.random = random;
+      state.tips = tips;
     });
     onMounted(() => {
       let viewWidth = document.documentElement.clientWidth;
@@ -370,7 +182,13 @@ export default {
       });
     };
     checkViewport();
-    return { ...toRefs(state), jungle };
+    const goBackToSection = () => {
+      window.location.href = "/learning";
+    };
+    const switchAll = () => {
+      state.viewAll = true;
+    };
+    return { ...toRefs(state), jungle, switchAll, goBackToSection };
   }
 };
 </script>

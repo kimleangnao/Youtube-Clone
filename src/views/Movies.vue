@@ -33,7 +33,24 @@
       </li>
     </ul>
     <div class="movies__components">
-      <MovieBrowse :myWidth="viewportWidth" v-if="browse" />
+      <MovieBrowse
+        :recommendActiveIndex="recommendActiveIndex"
+        :recommendMovies="recommendMovies"
+        :activeRecommendMovies="activeRecommendMovies"
+        :prevRecommendMovies="prevRecommendMovies"
+        :nextRecommendMovies="nextRecommendMovies"
+        :freeMovies="freeMovies"
+        :freeMoviesActiveSlider="freeMoviesActiveSlider"
+        :freeMovieDivide="freeMovieDivide"
+        :freeMoviesActiveIndex="freeMoviesActiveIndex"
+        :sellMovieDivide="sellMovieDivide"
+        :sellMovieActiveIndex="sellMovieActiveIndex"
+        :sellMovieActiveSlider="sellMovieActiveSlider"
+        :myWidth="viewportWidth"
+        :switchViewAll="switchViewAll"
+        :viewAll="viewAll"
+        v-if="browse"
+      />
       <Purchased :myWidth="viewportWidth" v-if="purchased" />
     </div>
   </div>
@@ -43,6 +60,8 @@
 import MovieBrowse from "@/components/MovieBrowse.vue";
 import Purchased from "@/components/Purchased.vue";
 import sunset from "@/assets/sunset.jpg";
+import EventService from "@/services/EventService.js";
+
 import { onMounted, reactive, toRefs } from "vue";
 
 export default {
@@ -53,12 +72,197 @@ export default {
     const state = reactive({
       browse: true,
       purchased: false,
-      viewportWidth: 10
+      viewportWidth: 10,
+      movies: [],
+      activeRecommendMovies: [],
+      recommendMovies: [],
+      recommendActiveIndex: 0,
+      freeMovies: [],
+      freeMoviesActiveSlider: [],
+      freeMovieDivide: [],
+      freeMoviesActiveIndex: 0,
+      viewAll: false,
+      sellMovies: [],
+      sellMovieDivide: [],
+      sellMovieActiveIndex: 0,
+      sellMovieActiveSlider: []
     });
+
+    let viewWidth = document.documentElement.clientWidth;
+    if (viewWidth >= 1824) {
+      state.viewportWidth = 10;
+    } else if (viewWidth >= 1224) {
+      state.viewportWidth = 9;
+    } else if (viewWidth >= 768) {
+      state.viewportWidth = 8;
+    } else if (viewWidth >= 321) {
+      state.viewportWidth = 7;
+    }
+
+    EventService.getMovies().then(response => {
+      //we got the movies
+      state.movies = response.data;
+      console.log(response.data);
+      divideUpRecommendMovie();
+      //get the one that is only free, price = 0
+      let freeMovies = [];
+      for (let i = 0; i < response.data.length; i++) {
+        //
+        if (response.data[i].price == 0) {
+          freeMovies.push(response.data[i]);
+        }
+      }
+      state.freeMovies = freeMovies;
+
+      console.log("free Movies:", state.freeMovies);
+      divideupFreeMovies();
+
+      let sellMovies = [];
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i].price > 0) {
+          sellMovies.push(response.data[i]);
+        }
+      }
+
+      //sort
+      let sortedSellMovies = mergeSort(sellMovies);
+      console.log("sortedSellMovies:", sortedSellMovies);
+
+      state.sellMovies = sortedSellMovies;
+      console.log("sell Movies:", state.sellMovies);
+      divideupSellMovies();
+    });
+
+    function mergeSort(giveArray) {
+      //if our array is less than 2, then there is nothing to sort, just return that
+      if (giveArray.length < 2) {
+        return giveArray;
+      }
+
+      //sort in here
+      //find mid point
+      let midIndex = Math.floor(giveArray.length / 2);
+
+      let left = giveArray.slice(0, midIndex);
+      let right = giveArray.slice(midIndex);
+
+      const sortedLeft = mergeSort(left);
+      const sortedRight = mergeSort(right);
+
+      const mergeSortedArray = [];
+      let sortedLeftIndex = 0;
+      let sortedRightIndex = 0;
+
+      while (mergeSortedArray.length < left.length + right.length) {
+        //we merge in here
+        //now we need to detect if the left or the right side run out of index
+
+        //if the leftIndex is less than sortedLeft.length
+        //if the right side is run out
+        //or if the sortedLeft[index] < sortedRight[index]
+        if (
+          sortedLeftIndex < sortedLeft.length &&
+          (sortedRight.length == sortedRightIndex ||
+            sortedLeft[sortedLeftIndex].viewscount >
+              sortedRight[sortedRightIndex].viewscount)
+        ) {
+          //left[index] < right[index]
+          //add that number to mergeSortedArray
+          mergeSortedArray.push(sortedLeft[sortedLeftIndex]);
+          //and +1 to sortedLeftIndex
+          //bcause we have one less number in the left index
+          sortedLeftIndex += 1;
+        } else {
+          //that mean the left[index] > right[index]
+          mergeSortedArray.push(sortedRight[sortedRightIndex]);
+          //+1 to right
+          sortedRightIndex += 1;
+        }
+      }
+
+      return mergeSortedArray;
+    }
+
+    //we have to be awre of the viewport
+    //make sure that what we display in gropu in recommendMovie is base of the viewport
+
+    const divideUpRecommendMovie = () => {
+      //
+      if (state.viewportWidth == 10) {
+        //10 = 6 at a time
+        //so each array have 6 movies
+        let count = 0;
+        let currentMoviesArray = [];
+
+        for (let i = 0; i < state.movies.length; i++) {
+          //
+          if (count < 5) {
+            //
+            currentMoviesArray.push(state.movies[i]);
+            count++;
+          } else if (count == 5) {
+            currentMoviesArray.push(state.movies[i]);
+            state.recommendMovies.push(currentMoviesArray);
+            count = 0;
+            currentMoviesArray = [];
+          }
+        }
+      }
+      state.recommendActiveIndex = 0;
+      state.activeRecommendMovies =
+        state.recommendMovies[state.recommendActiveIndex];
+      console.log(state.activeRecommendMovies);
+    };
+
+    const divideupFreeMovies = () => {
+      if (state.viewportWidth == 10) {
+        let count = 0;
+        let currentMovies = [];
+        for (let i = 0; i < state.freeMovies.length; i++) {
+          if (count < 5) {
+            currentMovies.push(state.freeMovies[i]);
+            count++;
+          } else if (count == 5) {
+            currentMovies.push(state.freeMovies[i]);
+            state.freeMovieDivide.push(currentMovies);
+            count = 0;
+            currentMovies = [];
+          }
+        }
+        state.freeMoviesActiveIndex = 0;
+        state.freeMoviesActiveSlider =
+          state.freeMovieDivide[state.freeMoviesActiveIndex];
+        console.log("active free movies:", state.freeMoviesActiveSlider);
+      }
+    };
+
+    const divideupSellMovies = () => {
+      if (state.viewportWidth == 10) {
+        let count = 0;
+        let currentMovies = [];
+        for (let i = 0; i < state.sellMovies.length; i++) {
+          if (count < 5) {
+            currentMovies.push(state.sellMovies[i]);
+            count++;
+          } else if (count == 5) {
+            currentMovies.push(state.sellMovies[i]);
+            state.sellMovieDivide.push(currentMovies);
+            count = 0;
+            currentMovies = [];
+          }
+        }
+
+        state.sellMovieActiveIndex = 0;
+        state.sellMovieActiveSlider =
+          state.sellMovieDivide[state.sellMovieActiveIndex];
+        console.log("sell movie slider:", state.sellMovieActiveSlider);
+      }
+    };
 
     const switchToBrowse = () => {
       state.browse = true;
       state.purchased = false;
+      state.viewAll = false;
     };
 
     const switchToPurchased = () => {
@@ -66,18 +270,7 @@ export default {
       state.purchased = true;
     };
 
-    onMounted(() => {
-      let viewWidth = document.documentElement.clientWidth;
-      if (viewWidth >= 1824) {
-        state.viewportWidth = 10;
-      } else if (viewWidth >= 1224) {
-        state.viewportWidth = 9;
-      } else if (viewWidth >= 768) {
-        state.viewportWidth = 8;
-      } else if (viewWidth >= 321) {
-        state.viewportWidth = 7;
-      }
-    });
+    onMounted(() => {});
     const checkViewport = () => {
       //
       window.addEventListener("resize", function() {
@@ -95,7 +288,43 @@ export default {
     };
     checkViewport();
 
-    return { ...toRefs(state), switchToBrowse, switchToPurchased, sunset };
+    const nextRecommendMovies = () => {
+      console.log("Next Recommend!");
+      if (state.recommendMovies.length - 1 > state.recommendActiveIndex) {
+        console.log("pass 1");
+        state.recommendActiveIndex++;
+        console.log(state.recommendActiveIndex);
+        state.activeRecommendMovies =
+          state.recommendMovies[state.recommendActiveIndex];
+        console.log(state.activeRecommendMovies);
+      }
+    };
+
+    const prevRecommendMovies = () => {
+      console.log("Prev Recommend!");
+      if (state.recommendActiveIndex != 0) {
+        console.log("pass 1");
+        state.recommendActiveIndex--;
+        console.log(state.recommendActiveIndex);
+        state.activeRecommendMovies =
+          state.recommendMovies[state.recommendActiveIndex];
+        console.log(state.activeRecommendMovies);
+      }
+    };
+
+    const switchViewAll = () => {
+      state.viewAll = !state.viewAll;
+    };
+
+    return {
+      ...toRefs(state),
+      switchToBrowse,
+      switchToPurchased,
+      sunset,
+      nextRecommendMovies,
+      prevRecommendMovies,
+      switchViewAll
+    };
   }
 };
 </script>

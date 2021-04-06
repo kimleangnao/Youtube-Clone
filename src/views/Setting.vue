@@ -95,7 +95,7 @@ import SettingBilling from "@/components/SettingBilling.vue";
 import SettingAdvanced from "@/components/SettingAdvanced.vue";
 
 import { reactive, toRefs } from "vue";
-
+import { useRoute } from "vue-router";
 export default {
   name: "Setting",
   components: {
@@ -107,7 +107,10 @@ export default {
     SettingBilling,
     SettingAdvanced
   },
-  setup() {
+  props: {
+    changeCurrentRoute: Function
+  },
+  setup(props) {
     const state = reactive({
       account: true,
       notification: false,
@@ -118,6 +121,12 @@ export default {
       advanceSetting: false,
       viewportWidth: 10
     });
+
+    //pass route name back to app
+    let name = useRoute().path;
+    console.log(useRoute());
+    console.log("passname:", name);
+    props.changeCurrentRoute(name);
 
     const switchToAccount = () => {
       state.account = true;
@@ -274,7 +283,7 @@ export default {
 @media only screen and (min-width: 1824px) {
   .setting__nav {
     position: fixed;
-    width: 250px;
+    width: 240px;
     min-height: 100vh;
     background-color: rgb(238, 237, 237);
     display: block;

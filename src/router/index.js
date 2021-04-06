@@ -17,7 +17,7 @@ import Learning from "../views/Learning.vue";
 import Sports from "../views/Sports.vue";
 import Setting from "../views/Setting.vue";
 import Studio from "../views/Studio.vue";
-
+import ChannelGameProfile from "../views/ChannelGameProfile.vue";
 const routes = [
   {
     path: "/",
@@ -25,7 +25,7 @@ const routes = [
     component: Home
   },
   {
-    path: "/watch",
+    path: "/watch/:id",
     name: "Watch",
     component: Watch
   },
@@ -50,7 +50,7 @@ const routes = [
     component: Library
   },
   {
-    path: "/playlist",
+    path: "/playlist/:id",
     name: "Playlist",
     component: Playlist
   },
@@ -78,6 +78,11 @@ const routes = [
     path: "/gaming",
     name: "Gaming",
     component: Gaming
+  },
+  {
+    path: "/gaming/:id",
+    name: "ChannelGameProfile",
+    component: ChannelGameProfile
   },
   {
     path: "/live",

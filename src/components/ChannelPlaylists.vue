@@ -7,54 +7,12 @@
       <WrapComponent
         title="Created playlists"
         :playall="false"
-        :nextButton="true"
+        :nextButton="user.playlists.length > 6 ? true : false"
         :myWidth="myWidth"
       >
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-      </WrapComponent>
-      <WrapComponent
-        :myWidth="myWidth"
-        title="JavaScript"
-        :playall="false"
-        :nextButton="true"
-      >
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-      </WrapComponent>
-      <WrapComponent
-        :myWidth="myWidth"
-        title="HTML"
-        :playall="false"
-        :nextButton="true"
-      >
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-      </WrapComponent>
-      <WrapComponent
-        :myWidth="myWidth"
-        title="CSS"
-        :playall="false"
-        :nextButton="true"
-      >
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
+        <template v-for="playlist in user.playlists" :key="playlist.id">
+          <Playlist :playlist="playlist" />
+        </template>
       </WrapComponent>
     </div>
   </div>
@@ -71,6 +29,10 @@ export default {
     myWidth: {
       type: Number,
       required: false
+    },
+    user: {
+      type: Object,
+      required: true
     }
   },
   setup() {

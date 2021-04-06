@@ -45,7 +45,7 @@
       </div>
     </div>
     <div class="studioContent__component">
-      <StudioContentUploads v-if="uploads" />
+      <StudioContentUploads v-if="uploads" :uploadSwitch="uploadSwitch" />
       <StudioContentLive v-if="live" />
     </div>
   </div>
@@ -58,6 +58,12 @@ import StudioContentLive from "@/components/StudioContentLive.vue";
 import { reactive, toRefs } from "vue";
 export default {
   name: "StudioContent",
+  props: {
+    uploadSwitch: {
+      type: Function,
+      required: true
+    }
+  },
   components: {
     StudioContentUploads,
     StudioContentLive

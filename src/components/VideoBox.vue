@@ -2,7 +2,7 @@
   <div class="video__box">
     <div class="video__box__thumbnail" @click="goToVideo">
       <img
-        :src="video.thumbnail"
+        :src="require('@/assets/' + video.thumbnail)"
         alt="thumbnail"
         class="video__box__thumbnail__image"
       />
@@ -17,7 +17,6 @@
 </template>
 
 <script>
-//import { reactive } from "@vue/composition-api";
 import VideoDetails from "@/components/VideoDetails.vue";
 
 export default {
@@ -31,9 +30,9 @@ export default {
   components: {
     VideoDetails
   },
-  setup() {
+  setup(props) {
     const goToVideo = () => {
-      window.location.href = "/watch";
+      window.location.href = "/watch/" + props.video.id;
     };
     return { goToVideo };
   }
@@ -47,16 +46,17 @@ export default {
   display: flex;
   flex-flow: column nowrap;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
-.video__box:hover {
-  cursor: pointer;
-}
+
 .video__box__thumbnail {
   width: 100%;
   height: 60%;
   background-color: mediumseagreen;
   position: relative;
+}
+.video__box__thumbnail:hover {
+  cursor: pointer;
 }
 .video__box__thumbnail__timelength {
   position: absolute;

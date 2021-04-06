@@ -1,27 +1,32 @@
 <template>
   <div :class="[myWidth == 7 ? 'cmp--7' : myWidth == 8 ? 'cmp--7' : 'cmp']">
     <div class="cmp__left">
-      <img :src="profile" class="cmp__left__channel" alt="profile channel" />
+      <img
+        :src="require('@/assets/' + comment.userImage)"
+        class="cmp__left__channel"
+        alt="profile channel"
+      />
     </div>
     <div class="cmp__middle">
       <div class="cmp__middle__channlAndDate">
-        <div class="cmp__middle__channlAndDate__channel">Redi</div>
-        <div class="cmp__middle__channlAndDate__dateposted">2 months ago</div>
+        <div class="cmp__middle__channlAndDate__channel">
+          {{ comment.userName }}
+        </div>
+        <div class="cmp__middle__channlAndDate__dateposted">
+          {{ comment.posteDate }}
+        </div>
       </div>
       <div class="cp__middle__content">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit😁😁 . Vestibulum
-        non tincidunt libero. Phasellus sed finibus enim, vel porta augue.
-        Phasellus et nisl augue. Cras consectetur massa nisl, ut elementum dui
-        placerat sit amet😁😁😁.Nunc at orci nisl. Duis dictum purus vel justo
-        rutrum suscipit et nec enim. Phasellus vitae elementum purus. Duis
-        gravida tempor nulla quis interdum. 😁😁😁😁
+        {{ comment.postText }}
       </div>
       <div class="cp__middle__optional">
         <div class="cp__middle__optional__likeAndDislike">
           <div class="cp__middle__optional__likeAndDislike__like">
             <i class="fas fa-thumbs-up"></i>
           </div>
-          <div class="cp__middle__optional__likeAndDislike__likeCount">300</div>
+          <div class="cp__middle__optional__likeAndDislike__likeCount">
+            {{ comment.like }}
+          </div>
           <div class="cp__middle__optional__likeAndDislike__dislike">
             <i class="fas fa-thumbs-down"></i>
           </div>
@@ -33,7 +38,9 @@
             <path d="M8 10 L 27 10 L 27 11 L 8 11" class="svg__white" />
             <path d="M8 14 L 27 14 L 27 15 L 8 15" class="svg__white" />
           </svg>
-          <div class="cp__middle__optional__comments__count">25</div>
+          <div class="cp__middle__optional__comments__count">
+            {{ comment.comments.length }}
+          </div>
         </div>
       </div>
     </div>
@@ -46,17 +53,20 @@
 </template>
 
 <script>
-import profile from "@/assets/profile.png";
 export default {
   name: "ChannelCommunityPost",
   props: {
     myWidth: {
       type: Number,
       required: false
+    },
+    comment: {
+      type: Object,
+      required: true
     }
   },
   setup() {
-    return { profile };
+    return {};
   }
 };
 </script>

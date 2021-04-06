@@ -1,7 +1,22 @@
 <template>
   <div class="NSA">
-    <div class="NSA__rope"></div>
     <div
+      :class="[
+        agree
+          ? Annotataion
+            ? 'NSA__rope NSA__rope--agree '
+            : 'NSA__rope'
+          : 'NSA__rope'
+      ]"
+    ></div>
+    <div
+      v-if="Annotataion"
+      :class="[
+        agree ? 'NSA__circle NSA__circle--agree--annotation' : 'NSA__circle'
+      ]"
+    ></div>
+    <div
+      v-else
       :class="[agree ? 'NSA__circle NSA__circle--agree' : 'NSA__circle']"
     ></div>
   </div>
@@ -14,7 +29,8 @@ export default {
     agree: {
       type: Boolean,
       required: true
-    }
+    },
+    Annotataion: Boolean
   },
   setup() {
     return {};
@@ -39,6 +55,10 @@ export default {
   background-color: lightgrey;
   border-radius: 25px;
 }
+.NSA__rope--agree {
+  transition: all 0.5s ease;
+  background-color: red;
+}
 .NSA__circle {
   position: absolute;
   width: 30px;
@@ -47,6 +67,10 @@ export default {
   border-radius: 50%;
   transition: all 0.5s ease;
   left: 0px;
+}
+.NSA__circle--agree--annotation {
+  transition: all 0.5s ease;
+  left: 30px;
 }
 .NSA__circle--agree {
   transition: all 0.5s ease;

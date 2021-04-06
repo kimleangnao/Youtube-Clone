@@ -1,4 +1,4 @@
-<template>
+<template v-if="video">
   <div :class="[myWidth == 8 ? 'tv--100' : myWidth == 7 ? 'tv--100' : 'tv']">
     <div
       :class="[
@@ -10,8 +10,12 @@
         fromHistoryWidth == 8 ? 'tv__thumbnail--h8' : ''
       ]"
     >
-      <img :src="profile" class="tv__thumbnail__image" @click="goToVideo" />
-      <div class="tv__thumbnail__length">2:50</div>
+      <img
+        :src="require('@/assets/' + video.thumbnail)"
+        class="tv__thumbnail__image"
+        @click="goToVideo"
+      />
+      <div class="tv__thumbnail__length">{{ video.videoLength }}</div>
       <div class="tv__thumbnail__watchLater">
         <svg class="tv__thumbnail__watchLater__svg">
           <circle
@@ -58,30 +62,18 @@
       ]"
     >
       <div class="tv__details__wrap" @click="goToVideo">
-        <div class="tv__details__wrap__title">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis at elit
-          ut enim molestie mollis vitae in erat.
-        </div>
+        <div class="tv__details__wrap__title">{{ video.title }}</div>
         <div class="tv__details__wrap__info">
           <div class="tv__details__wrap__info__list" @click.stop="goToChannel">
-            Redi
+            {{ video.profileName }}
             <i class="fas fa-check-circle"></i>
           </div>
           <div class="tv__details__wrap__info__list">
-            500K views &bullet; 2 days ago
+            {{ viewsCount() }} views &bullet; {{ video.profilePostDate }}
           </div>
         </div>
         <div class="tv__details__wrap__description">
-          🙆🏻‍♂️ New Year Wake Up 🙆🏻‍♀️ Lorem ipsum dolor sit amet, consectetur
-          adipiscing elit. Duis at elit ut enim molestie mollis vitae in erat.
-          Maecenas nisi erat, sagittis at purus non, dictum elementum enim.
-          Suspendisse mauris dui, gravida vel libero vehicula, malesuada
-          venenatis ante. Integer fringilla gravida pharetra. Integer et leo
-          nunc. Vestibulum id tincidunt mi. Etiam nec vehicula sapien. Lorem
-          ipsum dolor sit amet, consectetur adipiscing elit. Mauris rhoncus est
-          ut gravida vehicula. Vestibulum vitae elit nisi. Sed quis posuere dui,
-          non fringilla nunc. Aliquam in augue a tortor aliquam varius.
-          Phasellus dignissim enim id eros hendrerit accumsan.
+          {{ video.description }}
         </div>
         <div v-if="showOption" class="tv__details__wrap__optionMenu">
           <div class="tv__details__wrap__optionMenu__actions">
@@ -149,27 +141,58 @@ export default {
     fromHistoryWidth: {
       type: Number,
       required: false
+    },
+    video: {
+      type: Object,
+      required: false
+    },
+    userId: {
+      type: Number,
+      required: true
     }
   },
-  setup() {
+  setup(props) {
     const state = reactive({
       showOption: false
     });
     const goToVideo = () => {
-      window.location.href = "/watch";
+      window.location.href = "/watch/" + props.video.id;
     };
     const goToChannel = () => {
-      window.location.href = "/channel/dfdf";
+      window.location.href = "/channel/" + (props.userId ? props.userId : 1);
     };
     const showOptionSwitch = () => {
       state.showOption = !state.showOption;
+    };
+
+    const viewsCount = () => {
+      if (props.video) {
+        let views = props.video.viewscount.toString().split("");
+        let newArrayView = [];
+        let indexNum = 1;
+
+        for (let i = views.length - 1; i >= 0; i--) {
+          if (indexNum == 3) {
+            newArrayView.unshift(views[i]);
+            if (views[i - 1] != undefined) {
+              newArrayView.unshift(",");
+            }
+            indexNum = 1;
+          } else {
+            newArrayView.unshift(views[i]);
+            indexNum++;
+          }
+        }
+        return newArrayView.join("");
+      }
     };
     return {
       ...toRefs(state),
       goToVideo,
       profile,
       goToChannel,
-      showOptionSwitch
+      showOptionSwitch,
+      viewsCount
     };
   }
 };
@@ -347,7 +370,7 @@ export default {
 }
 .tv__details__wrap__description {
   width: 100%;
-  height: 35px;
+  height: 32px;
   margin-top: 10px;
   text-align: left;
   display: -webkit-box;

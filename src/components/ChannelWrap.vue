@@ -34,14 +34,16 @@
         <div
           class="channelwrap__channel__wrap__header__details__left__nameAndSub__name"
           :style="{ color: titleColor }"
+          @click="goBackToSection"
         >
-          {{ title }} <i class="fas fa-check-circle"></i>
+          {{ title ? title : "Unknown" }} <i class="fas fa-check-circle"></i>
         </div>
         <div
           v-if="showSubscriber"
+          :style="{ color: titleColor }"
           class="channelwrap__channel__wrap__header__details__left__nameAndSub__subcount"
         >
-          500 subscribers
+          {{ subScriberAmount ? subScriberAmount : 500 }} Subscribers
         </div>
       </div>
     </div>
@@ -76,6 +78,10 @@ export default {
       type: String,
       required: true
     },
+    subScriberAmount: {
+      type: Number,
+      required: false
+    },
     showSubscriber: {
       type: Boolean,
       require: false
@@ -91,7 +97,8 @@ export default {
     titleColor: {
       type: String,
       required: false
-    }
+    },
+    goBackToSection: Function
   },
   setup() {
     return { profile };
@@ -185,6 +192,9 @@ export default {
   font-size: 1rem;
   font-weight: 500;
 }
+.channelwrap__channel__wrap__header__details__left__nameAndSub__name:hover {
+  cursor: pointer;
+}
 .fas {
   line-height: 44px;
 }
@@ -192,6 +202,7 @@ export default {
   width: 100%;
   height: 30%;
   font-size: 0.75rem;
+  color: white;
 }
 
 .channelwrap__channel__wrap__header__details__right {

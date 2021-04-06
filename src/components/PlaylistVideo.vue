@@ -3,7 +3,7 @@
     <div class="playlistwrap__lists__list__count">{{ id }}</div>
     <div class="playlistwrap__lists__list__thumbnail">
       <img
-        :src="profile"
+        :src="require('@/assets/' + video.thumbnail)"
         class="playlistwrap__lists__list__thumbnail__img"
         alt="thumbnail"
       />
@@ -11,10 +11,10 @@
     </div>
     <div class="playlistwrap__lists__list__details">
       <div class="playlistwrap__lists__list__details__title">
-        What is SASS?
+        {{ video.title }}
       </div>
       <div class="playlistwrap__lists__list__details__by">
-        REdi
+        {{ video.profileName }}
       </div>
     </div>
     <div class="playlistwrap__lists__list__option">
@@ -148,9 +148,11 @@ export default {
     id: {
       type: String,
       required: true
-    }
+    },
+    video: Object,
+    playlistId: Number
   },
-  setup() {
+  setup(props) {
     const state = reactive({
       showOption: false
     });
@@ -158,7 +160,8 @@ export default {
       state.showOption = !state.showOption;
     };
     const goToVideo = () => {
-      window.location.href = "/watch";
+      window.location.href =
+        "/watch/playlist=" + props.playlistId + "&index=" + props.id;
     };
     return { ...toRefs(state), profile, goToVideo, showOptionSwitch };
   }

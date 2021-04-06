@@ -1,28 +1,38 @@
 <template>
   <div class="playlistwrap">
     <div class="playlistwrap__fixed">
-      <div class="playlistwrap__fixed__thumbnail">
+      <div class="playlistwrap__fixed__thumbnail" v-if="playlist.thumbnail">
         <img
-          :src="profile"
+          :src="require('@/assets/' + playlist.thumbnail)"
           class="playlistwrap__fixed__thumbnail__img"
           alt="thumbnail"
         />
-        <div class="playlistwrap__fixed__thumbnail__play">
+        <div
+          class="playlistwrap__fixed__thumbnail__play"
+          @click="playThisPlaylist"
+        >
           <i class="fas fa-play"></i> PLAY ALL
         </div>
       </div>
 
       <div class="playlistwrap__fixed__title">
-        Web Development
+        {{ playlist.name }}
       </div>
       <div class="playlistwrap__fixed__details">
-        8 videos &bullet; 500 views &bullet; Last updated Aug 12, 2020
+        {{ playlist.videos.length }} videos &bullet; 0 views &bullet; Last
+        updated Aug 12, 2020
       </div>
       <div class="playlistwrap__fixed__functions">
-        <div class="playlistwrap__fixed__functions__button">
+        <div
+          class="playlistwrap__fixed__functions__button"
+          @click="deleteThisPlaylist(playlist.id)"
+        >
           <i class="fas fa-trash-alt"></i>
         </div>
-        <div class="playlistwrap__fixed__functions__button">
+        <div
+          class="playlistwrap__fixed__functions__button"
+          @click="playThisPlaylist"
+        >
           <i class="fas fa-random"></i>
         </div>
         <div class="playlistwrap__fixed__functions__button">
@@ -33,32 +43,30 @@
         </div>
       </div>
       <div class="playlistwrap__fixed__description">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
-        libero orci, mattis sit amet fermentum nec, tincidunt dictum erat.
-        Pellentesque mattis dui non malesuada ultricies. Vivamus ultrices augue
-        ac quam suscipit accumsan.
+        {{ playlist.description }}
       </div>
-      <div class="playlistwrap__fixed__channel">
+      <div class="playlistwrap__fixed__channel" v-if="playlist.creatorProfile">
         <img
-          :src="profile"
+          :src="require('@/assets/' + playlist.creatorProfile)"
           class="playlistwrap__fixed__channel__profile"
           alt="channel profile"
         />
-        <div class="playlistwrap__fixed__channel__name">REdi</div>
+        <div class="playlistwrap__fixed__channel__name">
+          {{ playlist.creator }}
+        </div>
         <div class="playlistwrap__fixed__channel__subscribe">
           SUBSCRIBE
         </div>
       </div>
     </div>
     <div class="playlistwrap__lists">
-      <PlaylistVideo id="1" />
-      <PlaylistVideo id="2" />
-      <PlaylistVideo id="3" />
-      <PlaylistVideo id="4" />
-      <PlaylistVideo id="5" />
-      <PlaylistVideo id="6" />
-      <PlaylistVideo id="7" />
-      <PlaylistVideo id="8" />
+      <template v-for="(video, index) in playlist.videos" :key="video.id">
+        <PlaylistVideo
+          :playlistId="playlist.id"
+          :id="index + 1"
+          :video="video"
+        />
+      </template>
     </div>
   </div>
 </template>
@@ -71,8 +79,16 @@ export default {
   components: {
     PlaylistVideo
   },
-  setup() {
-    return { profile };
+  props: {
+    playlist: Object,
+    deleteThisPlaylist: Function
+  },
+  setup(props) {
+    const playThisPlaylist = () => {
+      window.location.href =
+        "/watch/playlist=" + props.playlist.id + "&index=1";
+    };
+    return { profile, playThisPlaylist };
   }
 };
 </script>

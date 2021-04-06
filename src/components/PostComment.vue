@@ -28,6 +28,8 @@
             ? 'postComment__addComment__text--9'
             : 'postComment__addComment__text'
         ]"
+        @input="writeInput"
+        :value="comment"
       >
       </textarea>
       <div
@@ -37,10 +39,32 @@
             : 'postComment__addComment__functions'
         ]"
       >
-        <div class="postComment__addComment__functions__cancel">
+        <div
+          class="postComment__addComment__functions__cancel"
+          @click="clickToReply"
+        >
           CANCEL
         </div>
-        <div class="postComment__addComment__functions__submit">
+        <div
+          v-if="type == 'REPLY'"
+          :class="[
+            comment != ''
+              ? 'postComment__addComment__functions__submit postComment__addComment__functions__submit--active'
+              : 'postComment__addComment__functions__submit'
+          ]"
+          @click="makeAreplyToCommentCall"
+        >
+          {{ type }}
+        </div>
+        <div
+          v-else
+          :class="[
+            comment != ''
+              ? 'postComment__addComment__functions__submit postComment__addComment__functions__submit--active'
+              : 'postComment__addComment__functions__submit'
+          ]"
+          @click="makeAReplyCall"
+        >
           {{ type }}
         </div>
       </div>
@@ -62,15 +86,44 @@ export default {
     myWidth: {
       type: Number,
       required: true
-    }
+    },
+    makeAReply: {
+      type: Function
+    },
+    videoId: {
+      type: Number
+    },
+    commentId: {
+      type: String
+    },
+    makeAreplyToComment: {
+      type: Function
+    },
+    clickToReply: Function
   },
-  setup() {
+  setup(props) {
     const state = reactive({
       userImage: imageLogo,
-      hideCommentFunctions: false
+      hideCommentFunctions: false,
+      comment: ""
     });
+    const makeAReplyCall = () => {
+      props.makeAReply(props.videoId, state.comment);
+      state.comment = "";
+    };
+    const makeAreplyToCommentCall = () => {
+      props.makeAreplyToComment(props.videoId, props.commentId, state.comment);
+      state.comment = "";
+    };
+    const writeInput = e => {
+      state.comment = e.target.value;
+    };
+
     return {
-      ...toRefs(state)
+      ...toRefs(state),
+      writeInput,
+      makeAReplyCall,
+      makeAreplyToCommentCall
     };
   }
 };
@@ -185,6 +238,9 @@ export default {
   margin-left: 10px;
   border-radius: 2px;
   cursor: pointer;
+}
+.postComment__addComment__functions__submit--active {
+  background-color: dodgerblue;
 }
 .hideCommentFunctions {
   display: none;

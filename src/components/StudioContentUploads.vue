@@ -47,7 +47,10 @@
         class="studioContentUploads__noVideo__image"
       />
       <p class="studioContentUploads__noVideo__text">No content available</p>
-      <button class="studioContentUploads__noVideo__button">
+      <button
+        class="studioContentUploads__noVideo__button"
+        @click="uploadSwitch"
+      >
         UPLOAD VIDEOS
       </button>
     </div>
@@ -59,7 +62,12 @@ import cameraWoman from "@/assets/camera-woman.png";
 
 export default {
   name: "StudioContentUploads",
-
+  props: {
+    uploadSwitch: {
+      type: Function,
+      required: true
+    }
+  },
   setup() {
     return { cameraWoman };
   }

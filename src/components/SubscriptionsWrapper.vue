@@ -21,22 +21,68 @@
       <div class="subscription__wrapper__today__wrap">
         <div class="subscription__wrapper__top">
           <div class="subscription__wrapper__top__title">{{ title }}</div>
-          <div v-if="hideManage" class="subscription__wrapper__top__seeAll">
+          <div
+            v-if="hideManage"
+            class="subscription__wrapper__top__seeAll"
+            @click="goToHistory"
+          >
             SEE ALL
           </div>
           <div v-if="!hideManage" class="subscription__wrapper__top__manage">
             <div class="subscription__wrapper__top__manage__text">MANAGE</div>
             <div class="subscription__wrapper__top__manage__short">
-              <div class="subscription__wrapper__top__manage__short__svg">
-                <i class="fas fa-th"></i>
+              <div
+                class="subscription__wrapper__top__manage__short__svg"
+                @click="switchToBoxDisplay"
+              >
+                <i
+                  :class="[
+                    boxDisplay ? 'fas fa-th selected--display ' : 'fas fa-th '
+                  ]"
+                ></i>
               </div>
             </div>
             <div class="subscription__wrapper__top__manage__long">
-              <div class="subscription__wrapper__top__manage__long__svg">
-                <i class="fas fa-th-list"></i>
+              <div
+                class="subscription__wrapper__top__manage__long__svg"
+                @click="switchToDetailDisplay"
+              >
+                <i
+                  :class="[
+                    detailDisplay
+                      ? 'fas fa-th-list selected--display'
+                      : 'fas fa-th-list'
+                  ]"
+                ></i>
               </div>
             </div>
           </div>
+        </div>
+        <div
+          v-if="title == 'History'"
+          :class="[
+            myWidth == 7
+              ? 'subscription__wrapper__videos--7'
+              : myWidth == 8
+              ? 'subscription__wrapper__videos--8'
+              : myWidth == 9
+              ? 'subscription__wrapper__videos--9'
+              : 'subscription__wrapper__videos'
+          ]"
+        >
+          <template v-for="video in user.history" :key="video.id">
+            <PromoteVideo
+              :componentType="
+                route == '/library'
+                  ? 'library'
+                  : route == '/subscriptions'
+                  ? 'subscriptions'
+                  : ''
+              "
+              :video="video"
+              :userId="user.id"
+            />
+          </template>
         </div>
         <div
           :class="[
@@ -48,123 +94,53 @@
               ? 'subscription__wrapper__videos--9'
               : 'subscription__wrapper__videos'
           ]"
+          v-if="boxDisplay && title != 'History'"
         >
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
+          <template v-for="video in user.subscriptions" :key="video.id">
+            <PromoteVideo
+              :componentType="
+                route == '/library'
+                  ? 'library'
+                  : route == '/subscriptions'
+                  ? 'subscriptions'
+                  : ''
+              "
+              :video="video"
+              :userId="user.id"
+            />
+          </template>
+        </div>
+        <div
+          v-if="detailDisplay"
+          :class="[
+            myWidth == 7
+              ? 'subscription__wrapper__videos--7 wrap--row'
+              : myWidth == 8
+              ? 'subscription__wrapper__videos--8 wrap--row'
+              : myWidth == 9
+              ? 'subscription__wrapper__videos--9 wrap--row'
+              : 'subscription__wrapper__videos wrap--row'
+          ]"
+        >
+          <template v-for="video in user.subscriptions" :key="video.id">
+            <TrendingVideo :userId="user.id" :video="video" />
+          </template>
         </div>
       </div>
+
       <div v-if="hideManage" class="subscription__wrapper__today__wrap">
         <div class="subscription__wrapper__top">
           <div class="subscription__wrapper__top__title">
-            Watch later <span class="videos__count">120</span>
+            Watch later
+            <span class="videos__count">{{
+              user.watchLater.videos.length
+            }}</span>
           </div>
-          <div v-if="hideManage" class="subscription__wrapper__top__seeAll">
+          <div
+            v-show="user.watchLater.videos.length > 6"
+            v-if="hideManage"
+            class="subscription__wrapper__top__seeAll"
+          >
             SEE ALL
           </div>
         </div>
@@ -179,65 +155,25 @@
               : 'subscription__wrapper__videos'
           ]"
         >
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
+          <template v-for="video in user.watchLater.videos" :key="video.id">
+            <PromoteVideo
+              :componentType="
+                route == '/library'
+                  ? 'library'
+                  : route == '/subscriptions'
+                  ? 'subscriptions'
+                  : ''
+              "
+              likedVideo="fromWatchLater"
+              :video="video"
+              :userId="user.id"
+            />
+          </template>
         </div>
       </div>
       <div v-if="hideManage" class="subscription__wrapper__today__wrap">
         <div class="subscription__wrapper__top">
-          <div class="subscription__wrapper__top__title">
+          <div class="subscription__wrapper__top__title" id="playlist">
             Playlists
           </div>
         </div>
@@ -252,18 +188,9 @@
               : 'subscription__wrapper__videos'
           ]"
         >
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
+          <template v-for="playlist in user.playlists" :key="playlist">
+            <Playlist :playlist="playlist" />
+          </template>
         </div>
         <div
           v-if="extendPlaylist"
@@ -277,33 +204,26 @@
               : 'subscription__wrapper__videos'
           ]"
         >
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
+          <template v-for="playlist in user.playlists" :key="playlist">
+            <Playlist :playlist="playlist" />
+          </template>
         </div>
-        <div
-          v-if="extendPlaylist"
-          class="subscription__wrapper__seeMore"
-          @click="extendPlaylist = !extendPlaylist"
-        >
-          SEE LESS
-        </div>
-        <div
-          v-else
-          class="subscription__wrapper__seeMore"
-          @click="extendPlaylist = !extendPlaylist"
-        >
-          SEE MORE
-        </div>
+        <template v-show="user.playlists.length > 6">
+          <div
+            v-if="extendPlaylist"
+            class="subscription__wrapper__seeMore"
+            @click="extendPlaylist = !extendPlaylist"
+          >
+            SEE LESS
+          </div>
+          <div
+            v-else
+            class="subscription__wrapper__seeMore"
+            @click="extendPlaylist = !extendPlaylist"
+          >
+            SEE MORE
+          </div>
+        </template>
       </div>
       <div
         v-if="hideManage"
@@ -311,9 +231,14 @@
       >
         <div class="subscription__wrapper__top">
           <div class="subscription__wrapper__top__title">
-            Liked videos <span class="videos__count">20</span>
+            Liked videos
+            <span class="videos__count">{{ user.likedVideos.length }}</span>
           </div>
-          <div v-if="hideManage" class="subscription__wrapper__top__seeAll">
+          <div
+            v-show="user.likedVideos.length > 6"
+            v-if="hideManage"
+            class="subscription__wrapper__top__seeAll"
+          >
             SEE ALL
           </div>
         </div>
@@ -326,119 +251,21 @@
               : 'subscription__wrapper__videos'
           ]"
         >
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
-          <PromoteVideo
-            :componentType="
-              route == '/library'
-                ? 'library'
-                : route == '/subscriptions'
-                ? 'subscriptions'
-                : ''
-            "
-          />
+          <template v-for="video in user.likedVideos" :key="video.id">
+            <PromoteVideo
+              :componentType="
+                route == '/library'
+                  ? 'library'
+                  : route == '/subscriptions'
+                  ? 'subscriptions'
+                  : ''
+              "
+              likedVideo="fromlike"
+              :video="video"
+              :userId="user.id"
+            />
+          </template>
         </div>
-      </div>
-    </div>
-
-    <div
-      v-if="!hideManage"
-      :class="[
-        myWidth == 7
-          ? 'subscription__wrapper__yesterday--7'
-          : myWidth == 8
-          ? 'subscription__wrapper__yesterday--8'
-          : myWidth == 9
-          ? 'subscription__wrapper__yesterday--9'
-          : myWidth == 10
-          ? 'subscription__wrapper__yesterday--10'
-          : 'subscription__wrapper__yesterday'
-      ]"
-    >
-      <div class="subscription__wrapper__top">
-        <div class="subscription__wrapper__top__title">Yesterday</div>
-      </div>
-      <div
-        :class="[
-          myWidth == 7
-            ? 'subscription__wrapper__videos--7'
-            : myWidth == 8
-            ? 'subscription__wrapper__videos--8'
-            : myWidth == 9
-            ? 'subscription__wrapper__videos--9'
-            : 'subscription__wrapper__videos'
-        ]"
-      >
-        <PromoteVideo
-          :componentType="
-            route == '/library'
-              ? 'library'
-              : route == '/subscriptions'
-              ? 'subscriptions'
-              : ''
-          "
-        />
-        <PromoteVideo
-          :componentType="
-            route == '/library'
-              ? 'library'
-              : route == '/subscriptions'
-              ? 'subscriptions'
-              : ''
-          "
-        />
-        <PromoteVideo
-          :componentType="
-            route == '/library'
-              ? 'library'
-              : route == '/subscriptions'
-              ? 'subscriptions'
-              : ''
-          "
-        />
       </div>
     </div>
 
@@ -484,6 +311,7 @@
 import profile from "@/assets/profile.png";
 
 import PromoteVideo from "@/components/PromoteVideo.vue";
+import TrendingVideo from "@/components/TrendingVideo.vue";
 
 import Playlist from "@/components/Playlist.vue";
 import { onMounted, reactive, toRefs } from "vue";
@@ -502,20 +330,45 @@ export default {
     myWidth: {
       type: Number,
       required: true
+    },
+    user: {
+      type: Object,
+      required: true
     }
   },
-  components: { PromoteVideo, Playlist },
+  components: { PromoteVideo, Playlist, TrendingVideo },
   setup() {
     const state = reactive({
       extendPlaylist: false,
-      route: null
+      route: null,
+      boxDisplay: true,
+      detailDisplay: false,
+      currentUser: []
     });
+
+    const switchToBoxDisplay = () => {
+      state.boxDisplay = true;
+      state.detailDisplay = false;
+    };
+    const switchToDetailDisplay = () => {
+      state.boxDisplay = false;
+      state.detailDisplay = true;
+    };
+    const goToHistory = () => {
+      window.location.href = "/history";
+    };
 
     onMounted(() => {
       state.route = window.location.pathname;
     });
 
-    return { ...toRefs(state), profile };
+    return {
+      ...toRefs(state),
+      profile,
+      switchToBoxDisplay,
+      switchToDetailDisplay,
+      goToHistory
+    };
   }
 };
 </script>
@@ -524,9 +377,11 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap");
 .subscription__wrapper {
   width: 1280px;
+
   margin: 60px auto;
   font-family: Roboto, Arial, sans-serif;
   text-align: left;
+  background-color: white;
 }
 .subscription__wrapper--100 {
   width: 100%;
@@ -577,6 +432,7 @@ export default {
   height: 100%;
   border-bottom: 1px solid lightgrey;
   margin: 0 auto;
+  padding-bottom: 25px;
 }
 
 .subscription__Wrapper__stats {
@@ -720,6 +576,9 @@ export default {
   grid-template-columns: repeat(6, 1fr);
   grid-gap: 10px;
 }
+.wrap--row {
+  grid-template-columns: repeat(1, 1fr);
+}
 .subscription__wrapper__videos--7 {
   width: 100%;
   height: 100%;
@@ -773,7 +632,7 @@ export default {
   stroke: rgb(255, 255, 255);
 }
 .fa-th {
-  color: dodgerblue;
+  color: grey;
   font-size: 1.01rem;
   line-height: 18px;
 }
@@ -781,6 +640,10 @@ export default {
   color: grey;
   font-size: 1rem;
   line-height: 18px;
+}
+
+.selected--display {
+  color: dodgerblue;
 }
 
 .videos__count {

@@ -2,15 +2,142 @@
   <div class="watchVideo">
     <div class="watchVideo__video">
       <div class="watchVideo__video__play">
-        <VideoPlay />
-      </div>
-      <div class="watchVideo__video__details">
-        <div class="watchVideo__video__details__title">
-          <div class="watchVideo__video__details__title__hastag">
-            #WIN #WIN
+        <template v-if="video.videoLink">
+          <VideoPlay
+            :checkIfVideoEnded="checkIfVideoEnded"
+            :videoLink="video.videoLink"
+            :currentIndex="playlistIndex"
+            :playlistAutoplay="playlistAutoplay"
+            :addToHistory="addToHistory"
+          />
+        </template>
+        <template
+          v-if="
+            (isItAPlaylist && viewportWidth == 7) ||
+              (isItAPlaylist && viewportWidth == 8)
+          "
+        >
+          <div class="watchVideo__recommend__playlist">
+            <div class="watchVideo__recommend__playlist__header">
+              <div class="watchVideo__recommend__playlist__header__left">
+                <div class="watchVideo__recommend__playlist__header__title">
+                  {{ playlist.name }}
+                </div>
+                <div
+                  class="watchVideo__recommend__playlist__header__info"
+                  v-if="playlist.videos"
+                >
+                  {{ playlist.creator }}- {{ playlistIndex }}/{{
+                    playlist.videos.length
+                  }}
+                </div>
+              </div>
+              <div
+                class="watchVideo__recommend__playlist__header__right"
+                @click="playlistExpand = !playlistExpand"
+              >
+                <i class="fas fa-chevron-up"></i>
+              </div>
+            </div>
+            <div
+              class="watchVideo__recommend__playlist__functions"
+              v-if="playlistExpand"
+            >
+              <div
+                class="watchVideo__recommend__playlist__functions__icon"
+                @click="clickAutoReplay"
+              >
+                <i
+                  :class="[
+                    playlistAutoReplay
+                      ? 'fas fa-redo active--replay'
+                      : 'fas fa-redo'
+                  ]"
+                ></i>
+              </div>
+              <!-- 
+            <div
+              class="watchVideo__recommend__playlist__functions__icon"
+              @click="clickShuffle"
+            >
+              <i
+                :class="[
+                  playlistShuffle
+                    ? 'fas fa-random active--shuffle'
+                    : 'fas fa-random'
+                ]"
+              ></i>
+            </div>
+            --></div>
+            <div
+              class="watchVideo__recommend__playlist__wrap"
+              v-if="playlistExpand"
+            >
+              <template
+                v-for="(video, index) in playlist.videos"
+                :key="video.id"
+              >
+                <div
+                  :class="[
+                    index + 1 == playlistIndex
+                      ? 'watchVideo__recommend__playlist__wrap__list playlist--active'
+                      : 'watchVideo__recommend__playlist__wrap__list'
+                  ]"
+                  @click="goToLocation(playlist.id, index)"
+                >
+                  <div
+                    class="watchVideo__recommend__playlist__wrap__list__icon"
+                  >
+                    <template v-if="index + 1 == playlistIndex">
+                      <i class="fas fa-pause-circle"></i>
+                    </template>
+                    <template v-else>
+                      <i class="fas fa-play"></i>
+                    </template>
+                  </div>
+                  <div
+                    class="watchVideo__recommend__playlist__wrap__list__thumbnail"
+                  >
+                    <img
+                      :src="require('@/assets/' + video.thumbnail)"
+                      alt="thumbnail"
+                      class="watchVideo__recommend__playlist__wrap__list__thumbnail__image"
+                    />
+                  </div>
+                  <div
+                    class="watchVideo__recommend__playlist__wrap__list__info"
+                  >
+                    <div
+                      class="watchVideo__recommend__playlist__wrap__list__info__title"
+                    >
+                      {{ video.title }}
+                    </div>
+                    <div
+                      class="watchVideo__recommend__playlist__wrap__list__info__name"
+                    >
+                      {{ video.profileName }}
+                    </div>
+                  </div>
+                  <div
+                    class="watchVideo__recommend__playlist__wrap__list__delete"
+                  >
+                    <i
+                      class="fas fa-trash"
+                      @click.stop="clickDeleteVideoFromPlaylist(video.id)"
+                    ></i>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
+        </template>
+      </div>
+
+      <div class="watchVideo__video__details" v-if="video">
+        <div class="watchVideo__video__details__title">
+          <div class="watchVideo__video__details__title__hastag"></div>
           <div class="watchVideo__video__details__title__text">
-            Beautiful Sky
+            {{ video.title }}
           </div>
         </div>
         <div class="watchVideo__video__details__info">
@@ -18,10 +145,10 @@
             v-if="viewportWidth == 7"
             class="watchVideo__video__details__viewsAndDate"
           >
-            400K
+            {{ viewsCount() }}
           </div>
           <div v-else class="watchVideo__video__details__viewsAndDate">
-            400,400 views &bullet; Aug 5, 2020
+            {{ viewsCount() }} views &bullet; {{ video.profilePostDate }}
           </div>
           <div class="watchVideo__video__details__metricAndFunction">
             <div
@@ -30,25 +157,37 @@
             >
               <svg
                 class="watchVideo__video__details__metricAndFunction__like__svg"
+                @click="userClickLike"
               >
                 <path
                   d="M0 15 L 4 15 L 4 35 L 0 35 "
-                  class="watchVideo__video__details__metricAndFunction__like__svg__grey"
+                  :class="[
+                    liked
+                      ? ' watchVideo__video__details__metricAndFunction__like__svg__blue'
+                      : 'watchVideo__video__details__metricAndFunction__like__svg__grey'
+                  ]"
                 />
                 <path
                   d="M 7 35 L 7 15 L 18 7 L 20 10 L 18 15 L 27 15 L 30 20 L 27 35Z"
-                  class="watchVideo__video__details__metricAndFunction__like__svg__grey"
+                  :class="[
+                    liked
+                      ? ' watchVideo__video__details__metricAndFunction__like__svg__blue'
+                      : 'watchVideo__video__details__metricAndFunction__like__svg__grey'
+                  ]"
                 />
               </svg>
               <div
                 class="watchVideo__video__details__metricAndFunction__like__num"
               >
-                323
+                {{ video.like }}
               </div>
             </div>
             <div class="watchVideo__video__details__metricAndFunction__ratio">
               <div
                 class="watchVideo__video__details__metricAndFunction__ratio__like"
+                :style="{
+                  width: (video.like / (video.dislike + video.like)) * 100 + '%'
+                }"
               ></div>
             </div>
             <div
@@ -57,24 +196,34 @@
             >
               <svg
                 class="watchVideo__video__details__metricAndFunction__dislike__svg"
+                @click="userClickDislike"
               >
                 <path
                   d="M 30 7 L 30 27 L 26 27 L 26 7"
-                  class="watchVideo__video__details__metricAndFunction__dislike__svg__grey"
+                  :class="[
+                    disliked
+                      ? 'watchVideo__video__details__metricAndFunction__dislike__svg__red'
+                      : 'watchVideo__video__details__metricAndFunction__dislike__svg__grey'
+                  ]"
                 />
                 <path
                   d="M 23 7 L 23 27 L 12 35 L 10 32 L 12 27 L 3 27 L 0 20 L 3 7 "
-                  class="watchVideo__video__details__metricAndFunction__dislike__svg__grey"
+                  :class="[
+                    disliked
+                      ? 'watchVideo__video__details__metricAndFunction__dislike__svg__red '
+                      : 'watchVideo__video__details__metricAndFunction__dislike__svg__grey'
+                  ]"
                 />
               </svg>
               <div
                 class="watchVideo__video__details__metricAndFunction__dislike__num"
               >
-                300
+                {{ video.dislike }}
               </div>
             </div>
             <div
-              title="Share?"
+              @click="switchShowShare"
+              title="Share ?"
               class="watchVideo__video__details__metricAndFunction__share"
             >
               <svg
@@ -91,7 +240,10 @@
                 SHARE
               </div>
             </div>
-            <div class="watchVideo__video__details__metricAndFunction__save">
+            <div
+              class="watchVideo__video__details__metricAndFunction__save"
+              @click="switchShowSave"
+            >
               <svg
                 class="watchVideo__video__details__metricAndFunction__save__svg"
               >
@@ -122,7 +274,10 @@
                 SAVE
               </div>
             </div>
-            <div class="watchVideo__video__details__metricAndFunction__report">
+            <div
+              class="watchVideo__video__details__metricAndFunction__report"
+              @click="reportMenuSwitch"
+            >
               <svg
                 class="watchVideo__video__details__metricAndFunction__report__svg"
               >
@@ -145,6 +300,26 @@
                   class="watchVideo__video__details__metricAndFunction__report__svg__grey"
                 />
               </svg>
+              <div
+                v-if="reportMenu"
+                class="watchVideo__video__details__metricAndFunction__report--absolute"
+              >
+                <div
+                  @click.stop="reportMenuSwitch"
+                  class="watchVideo__video__details__metricAndFunction__report--absolute__list"
+                >
+                  <div
+                    class="watchVideo__video__details__metricAndFunction__report--absolute__list__icon"
+                  >
+                    <i class="fas fa-flag"></i>
+                  </div>
+                  <div
+                    class="watchVideo__video__details__metricAndFunction__report--absolute__list__text"
+                  >
+                    Report
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -167,12 +342,12 @@
                 class="watchVideo__video__user__wrap__channelNameWrap__name"
                 @click="goToChannel"
               >
-                Redi
+                {{ video.profileName }}
               </div>
               <div
                 class="watchVideo__video__user__wrap__channelNameWrap__subscribeNumber"
               >
-                1.93M subscribers
+                1 Subscriber
               </div>
             </div>
           </div>
@@ -213,58 +388,34 @@
                 : 'watchVideo__video__user__descriptionWrap__details '
             ]"
           >
-            <span
-              class="watchVideo__video__user__descriptionWrap__details__span"
-            >
-              This music will accompany you in a spiritual dimension. Ideal for
-              reiki practice and meditation. Namaste
-            </span>
-            <br />
-            <br />
-            <span>
-              You can download this track with the title "Energy Healing" here:
-              <br />
-              iTunes:
-            </span>
-            <a href="https://apple.co/3m3Yzj5">https://apple.co/3m3Yzj5</a>
-            <br />
-            <span>Amazon: </span>
-            <a href="https://amzn.to/3q1cngo">https://amzn.to/3q1cngo</a> <br />
-            <span>7 Digital: </span>
-            <a href="https://bit.ly/3mlQA0B">https://bit.ly/3mlQA0B</a> <br />
-            <span
-              >Streaming music: <br />
-              Spotify:
-            </span>
-            <a href="https://spoti.fi/3nSjcz6">https://spoti.fi/3nSjcz6</a>
-            <br />
-            <span>Deezer: </span>
-            <a href="https://bit.ly/3m5D1lV">https://bit.ly/3m5D1lV</a> <br />
-            <span>YouTube Music: </span>
-            <a href="https://bit.ly/39tgGLU">https://bit.ly/39tgGLU</a> <br />
+            {{ video.description }}
           </div>
         </div>
-        <div
-          v-if="height50px"
-          class="watchVideo__video__user__moreOrLess"
-          @click="ShowMore"
+        <template
+          v-if="video.description ? video.description.length > 293 : false"
         >
-          SHOW MORE
-        </div>
-        <div
-          v-else
-          class="watchVideo__video__user__moreOrLess"
-          @click="ShowMore"
-        >
-          SHOW LESS
-        </div>
+          <div
+            v-if="height50px"
+            class="watchVideo__video__user__moreOrLess"
+            @click="ShowMore"
+          >
+            SHOW MORE
+          </div>
+          <div
+            v-else
+            class="watchVideo__video__user__moreOrLess"
+            @click="ShowMore"
+          >
+            SHOW LESS
+          </div>
+        </template>
       </div>
       <div v-if="vifComment == false" class="watchVideo__video__commentSection">
         <div class="watchVideo__video__commentSection__countAndSort">
           <div
             class="watchVideo__video__commentSection__countAndSort__commentsCount"
           >
-            4,000,000 Comments
+            {{ video.comments ? video.comments.length : "0" }} Comments
           </div>
           <div class="watchVideo__video__commentSection__countAndSort__sort">
             <svg class="watchVideo__video__commentSection__countAndSort__svg">
@@ -289,49 +440,200 @@
           </div>
         </div>
         <div class="watchVideo__video__commentSection__postComment">
-          <PostComment :myWidth="viewportWidth" type="COMMENT" />
-        </div>
-        <div class="watchVideo__video__commentSection__postComment__comments">
-          <Comments :myWidth="viewportWidth" type="REPLY" :pinned="true" />
-        </div>
-        <div class="comments__details__reply" @click="clickToViewReply">
-          <svg class="comments__details__reply__svg">
-            <path
-              d="M0 11 L 10 11 L 5 18Z"
-              class="comments__details__reply__svg__dodgerBlue"
-            />
-          </svg>
-          <div class="comments__details__reply__text">
-            View 100K replies
-          </div>
-        </div>
-        <div
-          class="watchVideo__video__commentSection__replyToComment"
-          v-if="viewReply"
-        >
-          <Comments
+          <PostComment
+            :videoId="Number(video.id)"
+            :makeAReply="makeAReply"
             :myWidth="viewportWidth"
-            type="REPLYTOREPLY"
-            :pinned="false"
+            type="COMMENT"
           />
         </div>
-      </div>
-    </div>
-    <div class="watchVideo__recommend">
-      <div class="watchVideo__recommend__next">
-        <RecommendVideo :space="false" :video="nextVideo" />
-      </div>
-      <div class="watchVideo__recommend__more">
-        <template v-for="(video, index) in recommendVideos" :key="index">
-          <RecommendVideo :space="true" :video="video" />
+        <template v-for="comment in video.comments" :key="comment.id">
+          <div class="watchVideo__video__commentSection__postComment__comments">
+            <Comments
+              :comment="comment"
+              :myWidth="viewportWidth"
+              :videoId="Number(video.id)"
+              type="REPLY"
+              :makeAreplyToComment="makeAreplyToComment"
+              :pinned="comment.pinned ? comment.pined : false"
+              :deleteThisComment="deleteThisComment"
+              :userLikeCommentId="userLikeCommentId"
+              :userDislikeCommentId="userDislikeCommentId"
+            />
+          </div>
+          <div
+            class="comments__details__reply"
+            @click="clickToViewReply(comment.id)"
+          >
+            <svg
+              class="comments__details__reply__svg"
+              v-if="comment.commentChild.length > 0"
+            >
+              <path
+                d="M0 11 L 10 11 L 5 18Z"
+                class="comments__details__reply__svg__dodgerBlue"
+              />
+            </svg>
+            <div
+              v-if="comment.commentChild.length > 0"
+              class="comments__details__reply__text"
+            >
+              View
+              {{ comment.commentChild ? comment.commentChild.length : "0" }}
+              replies
+            </div>
+          </div>
+          <div
+            class="watchVideo__video__commentSection__replyToComment"
+            v-if="comment.viewReply"
+          >
+            <template
+              v-for="commentChild in comment.commentChild"
+              :key="commentChild.id"
+            >
+              <Comments
+                :comment="commentChild"
+                :myWidth="viewportWidth"
+                type="REPLYTOREPLY"
+                :pinned="false"
+              />
+            </template>
+          </div>
         </template>
       </div>
+    </div>
+
+    <div class="watchVideo__recommend">
+      <template
+        v-if="isItAPlaylist && viewportWidth != 7 && viewportWidth != 8"
+      >
+        <div class="watchVideo__recommend__playlist">
+          <div class="watchVideo__recommend__playlist__header">
+            <div class="watchVideo__recommend__playlist__header__left">
+              <div class="watchVideo__recommend__playlist__header__title">
+                {{ playlist.name }}
+              </div>
+              <div
+                class="watchVideo__recommend__playlist__header__info"
+                v-if="playlist.videos"
+              >
+                {{ playlist.creator }}- {{ playlistIndex }}/{{
+                  playlist.videos.length
+                }}
+              </div>
+            </div>
+            <div
+              class="watchVideo__recommend__playlist__header__right"
+              @click="playlistExpand = !playlistExpand"
+            >
+              <i class="fas fa-chevron-up"></i>
+            </div>
+          </div>
+          <div
+            class="watchVideo__recommend__playlist__functions"
+            v-if="playlistExpand"
+          >
+            <div
+              class="watchVideo__recommend__playlist__functions__icon"
+              @click="clickAutoReplay"
+            >
+              <i
+                :class="[
+                  playlistAutoReplay
+                    ? 'fas fa-redo active--replay'
+                    : 'fas fa-redo'
+                ]"
+              ></i>
+            </div>
+            <!-- 
+            <div
+              class="watchVideo__recommend__playlist__functions__icon"
+              @click="clickShuffle"
+            >
+              <i
+                :class="[
+                  playlistShuffle
+                    ? 'fas fa-random active--shuffle'
+                    : 'fas fa-random'
+                ]"
+              ></i>
+            </div>
+            -->
+          </div>
+          <div
+            class="watchVideo__recommend__playlist__wrap"
+            v-if="playlistExpand"
+          >
+            <template v-for="(video, index) in playlist.videos" :key="video.id">
+              <div
+                :class="[
+                  index + 1 == playlistIndex
+                    ? 'watchVideo__recommend__playlist__wrap__list playlist--active'
+                    : 'watchVideo__recommend__playlist__wrap__list'
+                ]"
+                @click="goToLocation(playlist.id, index)"
+              >
+                <div class="watchVideo__recommend__playlist__wrap__list__icon">
+                  <template v-if="index + 1 == playlistIndex">
+                    <i class="fas fa-pause-circle"></i>
+                  </template>
+                  <template v-else>
+                    <i class="fas fa-play"></i>
+                  </template>
+                </div>
+                <div
+                  class="watchVideo__recommend__playlist__wrap__list__thumbnail"
+                >
+                  <img
+                    :src="require('@/assets/' + video.thumbnail)"
+                    alt="thumbnail"
+                    class="watchVideo__recommend__playlist__wrap__list__thumbnail__image"
+                  />
+                </div>
+                <div class="watchVideo__recommend__playlist__wrap__list__info">
+                  <div
+                    class="watchVideo__recommend__playlist__wrap__list__info__title"
+                  >
+                    {{ video.title }}
+                  </div>
+                  <div
+                    class="watchVideo__recommend__playlist__wrap__list__info__name"
+                  >
+                    {{ video.profileName }}
+                  </div>
+                </div>
+                <div
+                  class="watchVideo__recommend__playlist__wrap__list__delete"
+                >
+                  <i
+                    class="fas fa-trash"
+                    @click.stop="clickDeleteVideoFromPlaylist(video.id)"
+                  ></i>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+      <template v-for="(video, index) in recommendVideos" :key="index">
+        <template v-if="!isItAPlaylist">
+          <div class="watchVideo__recommend__next" v-if="index == 0">
+            <RecommendVideo :space="false" :video="video" />
+          </div>
+        </template>
+
+        <div class="watchVideo__recommend__more" v-if="index != 0">
+          <RecommendVideo :space="true" :video="video" />
+        </div>
+      </template>
+      <!-- 
       <button
         v-if="viewportWidth == 7"
         class="watchVideo__recommend__moreButton"
       >
         SHOW MORE
       </button>
+      -->
     </div>
   </div>
   <div
@@ -342,7 +644,7 @@
       <div
         class="watchVideo__video__commentSection__countAndSort__commentsCount"
       >
-        4,000,000 Comments
+        {{ video.comments ? video.comments.length : "0" }} Comments
       </div>
       <div class="watchVideo__video__commentSection__countAndSort__sort">
         <svg class="watchVideo__video__commentSection__countAndSort__svg">
@@ -367,28 +669,66 @@
       </div>
     </div>
     <div class="watchVideo__video__commentSection__postComment">
-      <PostComment :myWidth="viewportWidth" type="COMMENT" />
+      <PostComment
+        :videoId="Number(video.id)"
+        :makeAReply="makeAReply"
+        :myWidth="viewportWidth"
+        type="COMMENT"
+      />
     </div>
-    <div class="watchVideo__video__commentSection__postComment__comments">
-      <Comments :myWidth="viewportWidth" type="REPLY" :pinned="true" />
-    </div>
-    <div class="comments__details__reply" @click="clickToViewReply">
-      <svg class="comments__details__reply__svg">
-        <path
-          d="M0 11 L 10 11 L 5 18Z"
-          class="comments__details__reply__svg__dodgerBlue"
+    <template v-for="comment in video.comments" :key="comment.id">
+      <div class="watchVideo__video__commentSection__postComment__comments">
+        <Comments
+          :comment="comment"
+          :myWidth="viewportWidth"
+          :videoId="Number(video.id)"
+          type="REPLY"
+          :makeAreplyToComment="makeAreplyToComment"
+          :pinned="comment.pinned ? comment.pined : false"
+          :deleteThisComment="deleteThisComment"
+          :userLikeCommentId="userLikeCommentId"
+          :userDislikeCommentId="userDislikeCommentId"
         />
-      </svg>
-      <div class="comments__details__reply__text">
-        View 100K replies
       </div>
-    </div>
-    <div
-      class="watchVideo__video__commentSection__replyToComment"
-      v-if="viewReply"
-    >
-      <Comments :myWidth="viewportWidth" type="REPLYTOREPLY" :pinned="false" />
-    </div>
+      <div
+        class="comments__details__reply"
+        @click="clickToViewReply(comment.id)"
+      >
+        <svg
+          class="comments__details__reply__svg"
+          v-if="comment.commentChild.length > 0"
+        >
+          <path
+            d="M0 11 L 10 11 L 5 18Z"
+            class="comments__details__reply__svg__dodgerBlue"
+          />
+        </svg>
+        <div
+          v-if="comment.commentChild.length > 0"
+          class="comments__details__reply__text"
+        >
+          View
+          {{ comment.commentChild ? comment.commentChild.length : "0" }}
+          replies
+        </div>
+      </div>
+      <div
+        class="watchVideo__video__commentSection__replyToComment"
+        v-if="comment.viewReply"
+      >
+        <template
+          v-for="commentChild in comment.commentChild"
+          :key="commentChild.id"
+        >
+          <Comments
+            :comment="commentChild"
+            :myWidth="viewportWidth"
+            type="REPLYTOREPLY"
+            :pinned="false"
+          />
+        </template>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -403,235 +743,91 @@ import VideoPlay from "@/components/VideoPlay.vue";
 export default {
   name: "WatchVideo",
   components: { Comments, PostComment, RecommendVideo, VideoPlay },
-
-  setup() {
+  props: {
+    video: {
+      type: Object,
+      required: true
+    },
+    clickToViewReply: {
+      type: Function,
+      required: true
+    },
+    makeAReply: {
+      type: Function
+    },
+    makeAreplyToComment: {
+      type: Function
+    },
+    liked: Boolean,
+    disliked: Boolean,
+    userClickLike: Function,
+    userClickDislike: Function,
+    deleteThisComment: Function,
+    userLikeCommentId: Array,
+    userDislikeCommentId: Array,
+    switchShowShare: Function,
+    switchShowSave: Function,
+    recommendVideos: {
+      type: Array,
+      required: true
+    },
+    isItAPlaylist: Boolean,
+    playlist: Object,
+    playlistIndex: Number,
+    playlistAutoplay: Boolean,
+    playlistAutoReplay: Boolean,
+    playlistShuffle: Boolean,
+    clickShuffle: Function,
+    clickAutoReplay: Function,
+    clickDeleteVideoFromPlaylist: Function,
+    addToHistory: Function
+  },
+  setup(props) {
     const state = reactive({
       channelProfile: imageLogo,
       height50px: true,
       hideCommentFunctions: true,
       description: "",
-      viewReply: true,
-      nextVideo: {
-        id: "1",
-        profilePicture: imageLogo,
-        thumbnail: imageLogo,
-        channelName: "ExampleName1",
-        title:
-          "This will be a very very very long title, let keep it going for a while longer",
-        viewscount: 400_000,
-        uploadDate: "Jul 28 1993",
-        videoLength: "5:35"
-      },
-      recommendVideos: [
-        {
-          id: "2",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName2",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2012",
-          videoLength: "10:55"
-        },
-        {
-          id: "3",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName3",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2019",
-          videoLength: "1:25"
-        },
-        {
-          id: "4",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName4",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2016",
-          videoLength: "23:35"
-        },
-        {
-          id: "5",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName5",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2018",
-          videoLength: "8:16"
-        },
-        {
-          id: "6",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName6",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2009",
-          videoLength: "18:10"
-        },
-        {
-          id: "7",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName7",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2003",
-          videoLength: "55:28"
-        },
-        {
-          id: "8",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName8",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2012",
-          videoLength: "36:42"
-        },
-        {
-          id: "9",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName9",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2010",
-          videoLength: "6:52"
-        },
-        {
-          id: "10",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName10",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2005",
-          videoLength: "45:45"
-        },
-        {
-          id: "2",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName2",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2012",
-          videoLength: "10:55"
-        },
-        {
-          id: "3",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName3",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2019",
-          videoLength: "1:25"
-        },
-        {
-          id: "4",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName4",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2016",
-          videoLength: "23:35"
-        },
-        {
-          id: "5",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName5",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2018",
-          videoLength: "8:16"
-        },
-        {
-          id: "6",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName6",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2009",
-          videoLength: "18:10"
-        },
-        {
-          id: "7",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName7",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2003",
-          videoLength: "55:28"
-        },
-        {
-          id: "8",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName8",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2012",
-          videoLength: "36:42"
-        },
-        {
-          id: "9",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName9",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2010",
-          videoLength: "6:52"
-        },
-        {
-          id: "10",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName10",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2005",
-          videoLength: "45:45"
-        }
-      ],
       viewportWidth: 10,
-      vifComment: false
+      vifComment: false,
+      reportMenu: false,
+      playlistExpand: true
     });
 
+    //check if the video ended
+    //if it does, go to the next one if the length of the playlist -1 is > than the currentIndex
+    const checkIfVideoEnded = (ended, index) => {
+      if (ended && props.playlist.videos.length >= index + 1) {
+        window.location.href =
+          "/watch/playlist=" + props.playlist.id + "&index=" + (index + 1);
+      } else if (props.playlistAutoReplay) {
+        window.location.href =
+          "/watch/playlist=" + props.playlist.id + "&index=" + 1;
+      }
+    };
+
+    const reportMenuSwitch = () => {
+      state.reportMenu = !state.reportMenu;
+    };
+    //console.log("watchVideo:", props.recommendVideos);
+    //console.log("video:", props.video);
     const ShowMore = () => {
       state.height50px = !state.height50px;
     };
-    const clickToViewReply = () => {
-      state.viewReply = !state.viewReply;
+    /*
+    //manipulate in the parent component, not here!!!!!!!!!!
+    const clickToViewReply = id => {
+      console.log("state", state.videoCurrent);
+      //looking for the video with that id
+      for (let i = 0; i < state.videoCurrent.comments.length; i++) {
+        if (id == state.videoCurrent.comments[i].id) {
+          //found it, now change it to opposite of what it is
+          state.videoCurrent.comments[i].viewReply = !state.videoCurrent
+            .comments[i].viewReply;
+        }
+      }
     };
+    */
     onMounted(() => {
       let viewWidth = document.documentElement.clientWidth;
       if (viewWidth >= 1824) {
@@ -645,6 +841,7 @@ export default {
       }
       checkIfSmallDeviceComment();
     });
+
     const checkViewport = () => {
       //
       window.addEventListener("resize", function() {
@@ -662,23 +859,111 @@ export default {
       });
     };
     checkViewport();
+
     const checkIfSmallDeviceComment = () => {
+      console.log("check viewport!");
       if (state.viewportWidth == 7) {
         state.vifComment = true;
+        console.log(state.vifComment);
       } else if (state.viewportWidth == 8) {
         state.vifComment = true;
+        console.log(state.vifComment);
       } else state.vifComment = false;
     };
-
     const goToChannel = () => {
-      window.location.href = "/channel/dfdf";
+      window.location.href = "/channel/" + props.video.userId;
     };
+    const goToLocation = (playlistId, index) => {
+      //index + 1 because it start at 0
+      window.location.href =
+        "/watch/playlist=" + playlistId + "&index=" + (index + 1);
+    };
+
+    const viewsCount = () => {
+      if (props.video) {
+        let views = props.video.viewscount.toString().split("");
+        let newArrayView = [];
+        let indexNum = 1;
+
+        for (let i = views.length - 1; i >= 0; i--) {
+          if (indexNum == 3) {
+            newArrayView.unshift(views[i]);
+            if (views[i - 1] != undefined) {
+              newArrayView.unshift(",");
+            }
+
+            indexNum = 1;
+          } else {
+            newArrayView.unshift(views[i]);
+            indexNum++;
+          }
+        }
+        return newArrayView.join("");
+      }
+    };
+
+    let convertTime = function convertMs(ms) {
+      let seconds = (ms / 1000).toFixed(0);
+      let minutes = Math.floor(seconds / 60);
+      let hours = "";
+      let days = "";
+      let months = "";
+      let years = "";
+      if (minutes > 59) {
+        hours = Math.floor(minutes / 60);
+        if (hours > 23) {
+          days = Math.floor(hours / 24);
+          if (days > 30) {
+            months = Math.floor(days / 30);
+            if (months > 12) {
+              years = Math.floor(months / 12);
+            }
+          }
+        }
+        minutes = Math.floor(minutes % 60);
+        minutes = minutes >= 10 ? minutes : "0" + minutes;
+      }
+
+      seconds = Math.floor(seconds % 60);
+      seconds = seconds >= 10 ? seconds : "0" + seconds;
+      return [years, months, days, hours, minutes, seconds];
+    };
+
+    const convertDate = () => {
+      let startDate = new Date(props.video.profilePostDate);
+      let now = Date.now();
+
+      let result = convertTime(now - startDate.getTime());
+      let [years, months, days, hours, minutes, seconds] = result;
+      //console.log("year", years, months, days, hours, minutes, seconds);
+      if (years >= 1) {
+        return years + " year ago";
+      } else if (months >= 1) {
+        return months + " months ago";
+      } else if (days >= 1) {
+        return days + " days ago";
+      } else if (hours >= 1) {
+        return hours + " hours ago";
+      } else if (minutes >= 1) {
+        return minutes + " minutes ago";
+      } else if (seconds >= 1) {
+        return seconds + " seconds ago";
+      } else {
+        return "unknown ago";
+      }
+    };
+
     return {
       ...toRefs(state),
+      imageLogo,
       ShowMore,
-      clickToViewReply,
       checkIfSmallDeviceComment,
-      goToChannel
+      goToChannel,
+      reportMenuSwitch,
+      convertDate,
+      viewsCount,
+      goToLocation,
+      checkIfVideoEnded
     };
   }
 };
@@ -701,13 +986,11 @@ export default {
   }
   .watchVideo__video__play {
     width: 100%;
-    height: 250px;
-    background-color: lightgrey;
   }
   .watchVideo__video__details {
     font-family: Roboto, Arial, sans-serif;
     width: 100%;
-    height: 100px;
+    height: 120px;
     text-align: left;
   }
   .watchVideo__video__details__info {
@@ -720,17 +1003,18 @@ export default {
     border-bottom: 1px solid #0000001a;
   }
   .watchVideo__video__details__viewsAndDate {
-    width: 10%;
+    width: 15%;
     height: 100%;
     line-height: 40px;
     font-size: 0.9rem;
   }
   .watchVideo__video__details__metricAndFunction {
-    width: 90%;
+    width: 85%;
     height: 50px;
+    margin-right: 0;
     display: flex;
     flex-flow: row nowrap;
-    transform: scale(0.95);
+    transform: scale(0.85);
   }
   .watchVideo__video__user__wrap {
     width: 100%;
@@ -784,6 +1068,7 @@ export default {
   }
   .watchVideo__video__user__descriptionWrap__details {
     width: 100%;
+    min-height: 100px;
     text-align: left;
     font-size: 0.9rem;
     overflow: hidden;
@@ -847,6 +1132,166 @@ export default {
     width: 87%;
     margin-left: 60px;
   }
+
+  .watchVideo__recommend__playlist {
+    width: 100%;
+    max-height: 442px;
+    border: 1px solid rgb(207, 207, 207);
+    margin: 0 auto;
+  }
+  .watchVideo__recommend__playlist__header {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
+  .watchVideo__recommend__playlist__header__left {
+    width: 80%;
+  }
+  .watchVideo__recommend__playlist__header__title {
+    text-align: left;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 10px 10px 0 10px;
+  }
+  .watchVideo__recommend__playlist__header__info {
+    text-align: left;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.8rem;
+    padding: 3px 10px 0 10px;
+  }
+  .watchVideo__recommend__playlist__header__right {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .watchVideo__recommend__playlist__header__right .fa-chevron-up {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 30px;
+  }
+  .watchVideo__recommend__playlist__header__right .fa-chevron-up:hover {
+    background-color: rgb(226, 226, 226);
+    cursor: pointer;
+  }
+  .watchVideo__recommend__playlist__functions {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    flex-flow: row nowrap;
+  }
+  .watchVideo__recommend__playlist__functions__icon {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    margin-left: 10px;
+  }
+  .watchVideo__recommend__playlist__functions__icon:hover {
+    cursor: pointer;
+  }
+
+  .active--replay {
+    color: dodgerblue;
+  }
+  .active--shuffle {
+    color: dodgerblue;
+  }
+
+  .watchVideo__recommend__playlist__wrap {
+    width: 100%;
+    height: 325px;
+    overflow-y: scroll;
+  }
+  .watchVideo__recommend__playlist__wrap__list {
+    width: 100%;
+    height: 65px;
+    display: flex;
+    flex-flow: row nowrap;
+    margin-bottom: 5px;
+  }
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__icon
+    .fa-pause-circle,
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__icon
+    .fa-play,
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__delete
+    .fa-trash {
+    display: block;
+  }
+  .playlist--active {
+    background-color: rgb(235, 235, 235);
+  }
+  .watchVideo__recommend__playlist__wrap__list:hover {
+    cursor: pointer;
+    background-color: rgb(235, 235, 235);
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon {
+    width: 5%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon .fa-pause-circle {
+    line-height: 65px;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon .fa-play {
+    line-height: 65px;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__thumbnail {
+    width: 25%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__thumbnail__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info {
+    width: 55%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info__title {
+    width: 97%;
+    max-height: 60%;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: Roboto, Arial, sans-serif;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin-left: 3%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info__name {
+    margin-left: 3%;
+    width: 97%;
+    height: 40%;
+    text-align: left;
+    font-size: 0.8rem;
+    line-height: 25px;
+  }
+
+  .watchVideo__recommend__playlist__wrap__list__delete {
+    width: 15%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__delete .fa-trash {
+    line-height: 65px;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__delete .fa-trash:hover {
+    cursor: pointer;
+    color: red;
+  }
 }
 @media only screen and (min-width: 768px) {
   .watchVideo {
@@ -863,13 +1308,11 @@ export default {
   }
   .watchVideo__video__play {
     width: 100%;
-    height: 410px;
-    background-color: lightgrey;
   }
   .watchVideo__video__details {
     font-family: Roboto, Arial, sans-serif;
     width: 100%;
-    height: 100px;
+    height: 120px;
     text-align: left;
   }
   .watchVideo__video__details__info {
@@ -1008,6 +1451,166 @@ export default {
     width: 87%;
     margin-left: 60px;
   }
+
+  .watchVideo__recommend__playlist {
+    width: 100%;
+    max-height: 442px;
+    border: 1px solid rgb(207, 207, 207);
+    margin: 0 auto;
+  }
+  .watchVideo__recommend__playlist__header {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
+  .watchVideo__recommend__playlist__header__left {
+    width: 80%;
+  }
+  .watchVideo__recommend__playlist__header__title {
+    text-align: left;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 10px 10px 0 10px;
+  }
+  .watchVideo__recommend__playlist__header__info {
+    text-align: left;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.8rem;
+    padding: 3px 10px 0 10px;
+  }
+  .watchVideo__recommend__playlist__header__right {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .watchVideo__recommend__playlist__header__right .fa-chevron-up {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 30px;
+  }
+  .watchVideo__recommend__playlist__header__right .fa-chevron-up:hover {
+    background-color: rgb(226, 226, 226);
+    cursor: pointer;
+  }
+  .watchVideo__recommend__playlist__functions {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    flex-flow: row nowrap;
+  }
+  .watchVideo__recommend__playlist__functions__icon {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    margin-left: 10px;
+  }
+  .watchVideo__recommend__playlist__functions__icon:hover {
+    cursor: pointer;
+  }
+
+  .active--replay {
+    color: dodgerblue;
+  }
+  .active--shuffle {
+    color: dodgerblue;
+  }
+
+  .watchVideo__recommend__playlist__wrap {
+    width: 100%;
+    height: 325px;
+    overflow-y: scroll;
+  }
+  .watchVideo__recommend__playlist__wrap__list {
+    width: 100%;
+    height: 65px;
+    display: flex;
+    flex-flow: row nowrap;
+    margin-bottom: 5px;
+  }
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__icon
+    .fa-pause-circle,
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__icon
+    .fa-play,
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__delete
+    .fa-trash {
+    display: block;
+  }
+  .playlist--active {
+    background-color: rgb(235, 235, 235);
+  }
+  .watchVideo__recommend__playlist__wrap__list:hover {
+    cursor: pointer;
+    background-color: rgb(235, 235, 235);
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon {
+    width: 5%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon .fa-pause-circle {
+    line-height: 65px;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon .fa-play {
+    line-height: 65px;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__thumbnail {
+    width: 15%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__thumbnail__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info {
+    width: 55%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info__title {
+    width: 97%;
+    max-height: 60%;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: Roboto, Arial, sans-serif;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin-left: 3%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info__name {
+    margin-left: 3%;
+    width: 97%;
+    height: 40%;
+    text-align: left;
+    font-size: 0.8rem;
+    line-height: 25px;
+  }
+
+  .watchVideo__recommend__playlist__wrap__list__delete {
+    width: 15%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__delete .fa-trash {
+    line-height: 65px;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__delete .fa-trash:hover {
+    cursor: pointer;
+    color: red;
+  }
 }
 @media only screen and (min-width: 1224px) {
   .watchVideo {
@@ -1024,13 +1627,11 @@ export default {
   }
   .watchVideo__video__play {
     width: 100%;
-    height: 420px;
-    background-color: lightgrey;
   }
   .watchVideo__video__details {
     font-family: Roboto, Arial, sans-serif;
     width: 100%;
-    height: 100px;
+    height: 120px;
     text-align: left;
   }
   .watchVideo__video__details__info {
@@ -1171,6 +1772,166 @@ export default {
     width: 87%;
     margin-left: 60px;
   }
+
+  .watchVideo__recommend__playlist {
+    width: 390px;
+    max-height: 442px;
+    border: 1px solid rgb(207, 207, 207);
+    margin-left: 25px;
+  }
+  .watchVideo__recommend__playlist__header {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
+  .watchVideo__recommend__playlist__header__left {
+    width: 80%;
+  }
+  .watchVideo__recommend__playlist__header__title {
+    text-align: left;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 10px 10px 0 10px;
+  }
+  .watchVideo__recommend__playlist__header__info {
+    text-align: left;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.8rem;
+    padding: 3px 10px 0 10px;
+  }
+  .watchVideo__recommend__playlist__header__right {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .watchVideo__recommend__playlist__header__right .fa-chevron-up {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 30px;
+  }
+  .watchVideo__recommend__playlist__header__right .fa-chevron-up:hover {
+    background-color: rgb(226, 226, 226);
+    cursor: pointer;
+  }
+  .watchVideo__recommend__playlist__functions {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    flex-flow: row nowrap;
+  }
+  .watchVideo__recommend__playlist__functions__icon {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    margin-left: 10px;
+  }
+  .watchVideo__recommend__playlist__functions__icon:hover {
+    cursor: pointer;
+  }
+
+  .active--replay {
+    color: dodgerblue;
+  }
+  .active--shuffle {
+    color: dodgerblue;
+  }
+
+  .watchVideo__recommend__playlist__wrap {
+    width: 100%;
+    height: 325px;
+    overflow-y: scroll;
+  }
+  .watchVideo__recommend__playlist__wrap__list {
+    width: 100%;
+    height: 65px;
+    display: flex;
+    flex-flow: row nowrap;
+    margin-bottom: 5px;
+  }
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__icon
+    .fa-pause-circle,
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__icon
+    .fa-play,
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__delete
+    .fa-trash {
+    display: block;
+  }
+  .playlist--active {
+    background-color: rgb(235, 235, 235);
+  }
+  .watchVideo__recommend__playlist__wrap__list:hover {
+    cursor: pointer;
+    background-color: rgb(235, 235, 235);
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon {
+    width: 5%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon .fa-pause-circle {
+    line-height: 65px;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon .fa-play {
+    line-height: 65px;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__thumbnail {
+    width: 25%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__thumbnail__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info {
+    width: 55%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info__title {
+    width: 97%;
+    max-height: 60%;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: Roboto, Arial, sans-serif;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin-left: 3%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info__name {
+    margin-left: 3%;
+    width: 97%;
+    height: 40%;
+    text-align: left;
+    font-size: 0.8rem;
+    line-height: 25px;
+  }
+
+  .watchVideo__recommend__playlist__wrap__list__delete {
+    width: 15%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__delete .fa-trash {
+    line-height: 65px;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__delete .fa-trash:hover {
+    cursor: pointer;
+    color: red;
+  }
 }
 @media only screen and (min-width: 1824px) {
   .watchVideo {
@@ -1188,13 +1949,11 @@ export default {
   }
   .watchVideo__video__play {
     width: 100%;
-    height: 720px;
-    background-color: lightgrey;
   }
   .watchVideo__video__details {
     font-family: Roboto, Arial, sans-serif;
     width: 100%;
-    height: 100px;
+    height: 120px;
     text-align: left;
   }
   .watchVideo__video__details__info {
@@ -1213,7 +1972,7 @@ export default {
     font-size: 0.9rem;
   }
   .watchVideo__video__details__metricAndFunction {
-    width: 30%;
+    width: 35%;
     height: 50px;
     display: flex;
     flex-flow: row nowrap;
@@ -1285,6 +2044,167 @@ export default {
     width: 400px;
     margin-left: 24px;
   }
+
+  .watchVideo__recommend__playlist {
+    width: 390px;
+    max-height: 442px;
+    border: 1px solid rgb(207, 207, 207);
+    margin-left: 25px;
+  }
+  .watchVideo__recommend__playlist__header {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
+  .watchVideo__recommend__playlist__header__left {
+    width: 80%;
+  }
+  .watchVideo__recommend__playlist__header__title {
+    text-align: left;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 10px 10px 0 10px;
+  }
+  .watchVideo__recommend__playlist__header__info {
+    text-align: left;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 0.8rem;
+    padding: 3px 10px 0 10px;
+  }
+  .watchVideo__recommend__playlist__header__right {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .watchVideo__recommend__playlist__header__right .fa-chevron-up {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    line-height: 30px;
+  }
+  .watchVideo__recommend__playlist__header__right .fa-chevron-up:hover {
+    background-color: rgb(226, 226, 226);
+    cursor: pointer;
+  }
+  .watchVideo__recommend__playlist__functions {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    flex-flow: row nowrap;
+  }
+  .watchVideo__recommend__playlist__functions__icon {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    margin-left: 10px;
+  }
+  .watchVideo__recommend__playlist__functions__icon:hover {
+    cursor: pointer;
+  }
+
+  .active--replay {
+    color: dodgerblue;
+  }
+  .active--shuffle {
+    color: dodgerblue;
+  }
+
+  .watchVideo__recommend__playlist__wrap {
+    width: 100%;
+    height: 325px;
+    overflow-y: scroll;
+  }
+  .watchVideo__recommend__playlist__wrap__list {
+    width: 100%;
+    height: 65px;
+    display: flex;
+    flex-flow: row nowrap;
+    margin-bottom: 5px;
+  }
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__icon
+    .fa-pause-circle,
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__icon
+    .fa-play,
+  .watchVideo__recommend__playlist__wrap__list:hover
+    .watchVideo__recommend__playlist__wrap__list__delete
+    .fa-trash {
+    display: block;
+  }
+  .playlist--active {
+    background-color: rgb(235, 235, 235);
+  }
+  .watchVideo__recommend__playlist__wrap__list:hover {
+    cursor: pointer;
+    background-color: rgb(235, 235, 235);
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon {
+    width: 5%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon .fa-pause-circle {
+    line-height: 65px;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__icon .fa-play {
+    line-height: 65px;
+    font-size: 0.8rem;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__thumbnail {
+    width: 25%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__thumbnail__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info {
+    width: 55%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info__title {
+    width: 97%;
+    max-height: 60%;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: Roboto, Arial, sans-serif;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin-left: 3%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__info__name {
+    margin-left: 3%;
+    width: 97%;
+    height: 40%;
+    text-align: left;
+    font-size: 0.8rem;
+    line-height: 25px;
+  }
+
+  .watchVideo__recommend__playlist__wrap__list__delete {
+    width: 15%;
+    height: 100%;
+  }
+  .watchVideo__recommend__playlist__wrap__list__delete .fa-trash {
+    line-height: 65px;
+    display: none;
+  }
+  .watchVideo__recommend__playlist__wrap__list__delete .fa-trash:hover {
+    cursor: pointer;
+    color: red;
+  }
+
   .watchVideo__recommend__more {
     margin-left: 24px;
     margin-top: 50px;
@@ -1386,6 +2306,12 @@ export default {
   transform: scale(0.8);
 }
 
+.watchVideo__video__details__metricAndFunction__like__svg__blue {
+  fill: dodgerblue;
+  stroke: dodgerblue;
+  transform: scale(0.8);
+}
+
 .watchVideo__video__details__metricAndFunction__like__num {
   width: 35px;
   height: 100%;
@@ -1406,7 +2332,8 @@ export default {
   height: 100%;
 }
 .watchVideo__video__details__metricAndFunction__dislike__svg:hover
-  .watchVideo__video__details__metricAndFunction__dislike__svg__grey {
+  .watchVideo__video__details__metricAndFunction__dislike__svg__grey,
+.watchVideo__video__details__metricAndFunction__dislike__svg__red {
   cursor: pointer;
   fill: red;
   stroke: red;
@@ -1414,6 +2341,11 @@ export default {
 .watchVideo__video__details__metricAndFunction__dislike__svg__grey {
   fill: grey;
   stroke: grey;
+  transform: scale(0.8);
+}
+.watchVideo__video__details__metricAndFunction__dislike__svg__red {
+  fill: red;
+  stroke: red;
   transform: scale(0.8);
 }
 .watchVideo__video__details__metricAndFunction__dislike__num {
@@ -1484,6 +2416,33 @@ export default {
   width: 60px;
   height: 100%;
   margin-left: 5px;
+  position: relative;
+}
+.watchVideo__video__details__metricAndFunction__report--absolute {
+  position: absolute;
+  width: 120px;
+  height: 50px;
+  background-color: white;
+  box-shadow: 0 0 5px grey;
+  right: -25px;
+  top: 30px;
+  display: flex;
+  align-items: center;
+}
+.watchVideo__video__details__metricAndFunction__report--absolute__list {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 80%;
+}
+.watchVideo__video__details__metricAndFunction__report--absolute__list:hover {
+  background-color: lightgrey;
+  cursor: pointer;
+}
+.watchVideo__video__details__metricAndFunction__report--absolute__list__icon {
+  width: 30%;
 }
 
 .watchVideo__video__details__metricAndFunction__report__svg {
@@ -1494,6 +2453,7 @@ export default {
   transform: scale(0.8);
   margin-top: -7px;
 }
+
 .watchVideo__video__details__metricAndFunction__report__svg:hover {
   cursor: pointer;
 }
@@ -1510,7 +2470,6 @@ export default {
   margin-top: 48px;
 }
 .watchVideo__video__details__metricAndFunction__ratio__like {
-  width: 51%;
   height: 100%;
   background-color: grey;
 }
@@ -1574,9 +2533,6 @@ export default {
   display: none;
 }
 
-.height50px {
-  height: 50px;
-}
 .watchVideo__video__user__moreOrLess {
   width: 85px;
   height: 40px;
@@ -1659,6 +2615,7 @@ export default {
 .comments__details__reply__svg {
   width: 20px;
   height: 30px;
+  margin-left: 12px;
 }
 .comments__details__reply__svg__dodgerBlue {
   fill: dodgerblue;

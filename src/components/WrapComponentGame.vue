@@ -15,7 +15,7 @@
     >
       <div class="wc__channel__upload__header">
         <img
-          :src="sunset"
+          :src="require('@/assets/' + image)"
           class="wc__channel__upload__header__image"
           alt="game logo"
         />
@@ -51,7 +51,6 @@
 </template>
 
 <script>
-import sunset from "@/assets/sunset.jpg";
 export default {
   name: "WrapComponentGame",
   props: {
@@ -66,11 +65,13 @@ export default {
     myWidth: {
       type: Number,
       required: false
-    }
+    },
+    image: String,
+    nextButton: Boolean
   },
   components: {},
   setup() {
-    return { sunset };
+    return {};
   }
 };
 </script>

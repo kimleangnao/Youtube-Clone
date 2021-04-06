@@ -13,8 +13,15 @@
           : 'ch__channel__featureVideo'
       ]"
     >
-      <div class="ch__channel__featureVideo__wrap">
-        <TrendingVideo :myWidth="myWidth" />
+      <div
+        class="ch__channel__featureVideo__wrap"
+        v-if="user.myChannelHighlight"
+      >
+        <TrendingVideo
+          :video="user.myChannelHighlight"
+          :myWidth="myWidth"
+          :userId="user.id"
+        />
       </div>
     </div>
     <div
@@ -30,19 +37,16 @@
         Featured channels
       </div>
       <div class="ch__channel__featureChannel__wrap">
-        <Channel />
-        <Channel />
-        <Channel />
+        <template v-for="channel in user.featureChannels" :key="channel.id">
+          <Channel :channel="channel" />
+        </template>
       </div>
     </div>
-    <div class="ch__channel__component">
+    <div class="ch__channel__component" v-if="user">
       <WrapComponent :myWidth="myWidth" title="Uploads" :playall="true">
-        <PromoteVideo />
-        <PromoteVideo />
-        <PromoteVideo />
-        <PromoteVideo />
-        <PromoteVideo />
-        <PromoteVideo />
+        <template v-for="(video, index) in user.videos" :key="video.id">
+          <PromoteVideo v-if="index < 6" :video="video" :userId="user.id" />
+        </template>
       </WrapComponent>
     </div>
   </div>
@@ -53,6 +57,9 @@ import TrendingVideo from "@/components/TrendingVideo.vue";
 import Channel from "@/components/Channel.vue";
 import WrapComponent from "@/components/WrapComponent.vue";
 import PromoteVideo from "@/components/PromoteVideo.vue";
+
+import { reactive, toRefs } from "vue";
+
 export default {
   name: "ChannelHome",
   components: {
@@ -65,10 +72,18 @@ export default {
     myWidth: {
       type: Number,
       required: false
+    },
+    user: {
+      type: Object,
+      required: true
     }
   },
   setup() {
-    return {};
+    const state = reactive({
+      videoUploadWrap: []
+    });
+
+    return { ...toRefs(state) };
   }
 };
 </script>

@@ -1,12 +1,13 @@
 <template>
   <div :class="[space == true ? 'recommend--space' : 'recommend']">
-    <div class="recommend__video">
+    <div class="recommend__video" v-if="video.thumbnail">
       <img
-        :src="video.thumbnail"
+        :src="require('@/assets/' + video.thumbnail)"
         class="recommend__video__thumbnail"
+        alt="thumbnail"
         @click="goToVideo"
       />
-      <div class="recommend__video__play">
+      <div class="recommend__video__play" @click="goToVideo">
         <svg class="recommend__video__play__svg">
           <path
             d="M10 5 L 10 35 L 35 20"
@@ -19,20 +20,22 @@
         <div class="recommend__video__redbar__progress"></div>
       </div>
     </div>
-    <div class="recommend__details" @click="goToVideo">
+    <div v-if="video" class="recommend__details" @click="goToVideo">
       <div class="recommend__details__title">
         {{ video.title }}
       </div>
       <div class="recommend__details__channel" @click.stop="goToChannel">
-        {{ video.channelName }}
+        {{ video.channelName ? video.channelName : video.profileName }}
       </div>
       <div class="recommend__details__viewsAndDate">
-        {{ viewsCount }} &bullet; {{ convertDate }}
+        {{ viewsCount }} views &bullet; {{ convertDate() }}
       </div>
       <div class="recommend__details__live">
         <div class="recommend__details__live__box">LIVE NOW</div>
       </div>
+      <!--
       <div v-if="showOption" class="recommend__optionMenu"></div>
+       -->
     </div>
     <div class="recommend__options">
       <svg class="recommend__options__svg" @click.stop="showOptionSwitch">
@@ -68,28 +71,33 @@ export default {
     const showOptionSwitch = () => {
       state.showOption = !state.showOption;
     };
+
     const goToVideo = () => {
-      window.location.href = "/watch";
+      window.location.href = "/watch/" + props.video.id;
     };
     const goToChannel = () => {
       window.location.href = "/channel/dfdf";
     };
 
     const viewsCount = computed(() => {
-      let views = props.video.viewscount.toString().split("");
+      if (props.video) {
+        let views = props.video.viewscount.toString().split("");
 
-      if (views.length == 5) {
-        return views[0] + views[1] + "K";
-      } else if (views.length == 6) {
-        return views[0] + views[1] + views[2] + "K";
-      } else if (views.length == 7) {
-        return views[0] + "M";
-      } else if (views.length == 8) {
-        return views[0] + views[1] + "M";
-      } else if (views.length == 9) {
-        return views[0] + views[1] + views[2] + "M";
-      } else if (views.length == 10) {
-        return views[0] + "B";
+        if (views.length == 5) {
+          return views[0] + views[1] + "K";
+        } else if (views.length == 6) {
+          return views[0] + views[1] + views[2] + "K";
+        } else if (views.length == 7) {
+          return views[0] + "M";
+        } else if (views.length == 8) {
+          return views[0] + views[1] + "M";
+        } else if (views.length == 9) {
+          return views[0] + views[1] + views[2] + "M";
+        } else if (views.length == 10) {
+          return views[0] + "B";
+        } else {
+          return "unknown";
+        }
       } else {
         return "unknown";
       }
@@ -122,13 +130,13 @@ export default {
       return [years, months, days, hours, minutes, seconds];
     };
 
-    const convertDate = computed(() => {
-      let startDate = new Date(props.video.uploadDate);
+    const convertDate = () => {
+      let startDate = new Date(props.video.profilePostDate);
       let now = Date.now();
 
       let result = convertTime(now - startDate.getTime());
       let [years, months, days, hours, minutes, seconds] = result;
-
+      //console.log("year", years, months, days, hours, minutes, seconds);
       if (years >= 1) {
         return years + " year ago";
       } else if (months >= 1) {
@@ -144,7 +152,7 @@ export default {
       } else {
         return "unknown ago";
       }
-    });
+    };
 
     return {
       ...toRefs(state),
@@ -188,7 +196,7 @@ export default {
 }
 
 .recommend__video {
-  width: 41%;
+  width: 164px;
   height: 100%;
   background-color: grey;
   position: relative;
@@ -251,7 +259,7 @@ export default {
 .recommend__details__title {
   font-family: "Roboto", Arial, sans-serif;
   width: 98%;
-  height: 40%;
+  max-height: 40%;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -263,8 +271,8 @@ export default {
 .recommend__details__channel {
   width: 98%;
   height: 20%;
-  margin-left: 5px;
   font-size: 0.85rem;
+  margin: 5px 0 0 5px;
 }
 .recommend__details__viewsAndDate {
   width: 98%;

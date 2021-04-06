@@ -23,6 +23,7 @@
       title="Sports"
       :customizeProfile="true"
       :showSubscriber="true"
+      :goBackToSection="goToSport"
     >
       <svg class="sports__channel__svg">
         <path d="M25 20 L 25 40 Q 25 50 ,40 55L 40 20 Z" class="svg__white" />
@@ -40,225 +41,94 @@
       </svg>
     </ChannelWrap>
   </div>
-  <div class="sports__content">
-    <template v-for="(video, index) in videos" :key="index.id">
-      <VideoBox :video="video" />
-    </template>
-  </div>
-  <div class="sports__highlight">
-    <WrapComponent
-      :myWidth="viewportWidth"
-      title="Highlights"
-      :viewall="true"
-      componentType="sports"
-    >
-      <template v-for="(video, index) in videosHighlights" :key="index.id">
-        <VideoBox :video="video" />
+  <template v-if="viewAll">
+    <div class="sports__content">
+      <template v-for="video in videos" :key="video.id">
+        <PromoteVideo
+          :titleColor="false"
+          :channelColor="false"
+          :infoColor="false"
+          :video="video"
+          :userId="video.userId"
+        />
       </template>
-    </WrapComponent>
-  </div>
+    </div>
+  </template>
+  <template v-if="!viewAll">
+    <div class="sports__content">
+      <template v-for="video in sports" :key="video.id">
+        <PromoteVideo
+          :titleColor="false"
+          :channelColor="false"
+          :infoColor="false"
+          :video="video"
+          :userId="video.userId"
+        />
+      </template>
+    </div>
+    <div class="sports__highlight">
+      <WrapComponent
+        :myWidth="viewportWidth"
+        title="Highlights"
+        :viewall="true"
+        componentType="sports"
+        :switchViewAll="switchToAll"
+      >
+        <template v-for="video in videosHighlights" :key="video.id">
+          <PromoteVideo
+            :titleColor="false"
+            :channelColor="false"
+            :infoColor="false"
+            :video="video"
+            :userId="video.userId"
+          />
+        </template>
+      </WrapComponent>
+    </div>
+  </template>
 </template>
 
 <script>
 import ChannelWrap from "@/components/ChannelWrap.vue";
-import VideoBox from "@/components/VideoBox.vue";
-import WrapComponent from "@/components/WrapComponent.vue";
 
+import WrapComponent from "@/components/WrapComponent.vue";
+import EventService from "@/services/EventService.js";
 import imageLogo from "@/assets/jungle.jpg";
 import rocks from "@/assets/rocks.png";
+import PromoteVideo from "@/components/PromoteVideo.vue";
 import { onMounted, reactive, toRefs } from "vue";
 
 export default {
   name: "Sports",
   components: {
     ChannelWrap,
-    VideoBox,
-    WrapComponent
+    WrapComponent,
+    PromoteVideo
   },
   setup() {
     const state = reactive({
-      videos: [
-        {
-          id: "1",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName1",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 1993",
-          videoLength: "5:35"
-        },
-        {
-          id: "2",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName2",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2012",
-          videoLength: "10:55"
-        },
-        {
-          id: "3",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName3",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2019",
-          videoLength: "1:25"
-        },
-        {
-          id: "4",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName4",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2016",
-          videoLength: "23:35"
-        },
-        {
-          id: "5",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName5",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2018",
-          videoLength: "8:16"
-        },
-        {
-          id: "6",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName6",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2009",
-          videoLength: "18:10"
-        },
-        {
-          id: "7",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName7",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2003",
-          videoLength: "55:28"
-        },
-        {
-          id: "8",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName8",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2012",
-          videoLength: "36:42"
-        },
-        {
-          id: "9",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName9",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2010",
-          videoLength: "6:52"
-        },
-        {
-          id: "10",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName10",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2005",
-          videoLength: "45:45"
-        }
-      ],
-      videosHighlights: [
-        {
-          id: "1",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName1",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 1993",
-          videoLength: "5:35"
-        },
-        {
-          id: "2",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName2",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2012",
-          videoLength: "10:55"
-        },
-        {
-          id: "3",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName3",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2019",
-          videoLength: "1:25"
-        },
-        {
-          id: "4",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName4",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2016",
-          videoLength: "23:35"
-        },
-        {
-          id: "5",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName4",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2016",
-          videoLength: "23:35"
-        },
-        {
-          id: "6",
-          profilePicture: imageLogo,
-          thumbnail: imageLogo,
-          channelName: "ExampleName4",
-          title:
-            "This will be a very very very long title, let keep it going for a while longer",
-          viewscount: 400_000,
-          uploadDate: "Jul 28 2016",
-          videoLength: "23:35"
-        }
-      ],
+      viewAll: false,
+      videos: [],
+      sports: [],
+      videosHighlights: [],
       viewportWidth: 10
     });
+
+    EventService.getSports().then(response => {
+      state.videos = response.data;
+      let hightlight = [];
+      let sports = [];
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i].category == "highlight") {
+          hightlight.push(response.data[i]);
+        } else if (response.data[i].category == "sport") {
+          sports.push(response.data[i]);
+        }
+      }
+      state.videosHighlights = hightlight;
+      state.sports = sports;
+    });
+
     onMounted(() => {
       let viewWidth = document.documentElement.clientWidth;
       if (viewWidth >= 1824) {
@@ -287,10 +157,19 @@ export default {
       });
     };
     checkViewport();
+
+    const switchToAll = () => {
+      state.viewAll = true;
+    };
+    const goToSport = () => {
+      window.location.href = "/sports";
+    };
     return {
       ...toRefs(state),
       imageLogo,
-      rocks
+      rocks,
+      switchToAll,
+      goToSport
     };
   }
 };

@@ -2,7 +2,9 @@
   <div class="studioAnalytics">
     <div class="studioAnalytics__title">
       <div class="studioAnalytics__title__text">Channel analytics</div>
-      <div class="studioAnalytics__title__mode">ADVANCED MODE</div>
+      <div class="studioAnalytics__title__mode" @click="switchToAdvance">
+        ADVANCED MODE
+      </div>
     </div>
     <div class="studioAnalytics__header">
       <div class="studioAnalytics__header__lists">
@@ -86,6 +88,12 @@ export default {
     StudioAnalyticsReach,
     StudioAnalyticsEngagement,
     StudioAnalyticsAudience
+  },
+  props: {
+    switchToAdvance: {
+      type: Function,
+      required: true
+    }
   },
   setup() {
     const state = reactive({

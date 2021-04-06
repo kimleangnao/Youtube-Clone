@@ -2,28 +2,28 @@
   <div class="searchResultVideo" @click="goToVideo">
     <div class="searchResultVideo__thumbnail">
       <img
-        :src="imageLogo"
+        :src="require('@/assets/' + result.thumbnail)"
         class="searchResultVideo__thumbnail__img"
         alt="thumbnail"
       />
     </div>
     <div class="searchResultVideo__details">
       <div class="searchResultVideo__details__title">
-        Relaxing Japanese Zen Music - Best Sleep Music & Peaceful Music Relaxing
+        {{ result.title }}
       </div>
       <div class="searchResultVideo__details__viewdate">
-        94M &bullet; 11 years ago
+        {{ result.viewscount }} views &bullet; {{ result.profilePostDate }}
       </div>
       <div class="searchResultVideo__details__channel">
         <img
-          :src="imageLogo"
+          :src="require('@/assets/' + result.profileImage)"
           class="searchResultVideo__details__channel__profile"
           alt="profile picture"
         />
         <div class="searchResultVideo__details__channel__name">Redi</div>
       </div>
       <div class="searchResultVideo__details__description">
-        Thank you for listening, I hope you will have a good time here :)
+        {{ result.description }}
       </div>
       <div class="searchResultVideo__details__cc">
         <div class="searchResultVideo__details__cc__box">CC</div>
@@ -40,11 +40,12 @@ export default {
     myWidth: {
       type: Number,
       required: false
-    }
+    },
+    result: Object
   },
-  setup() {
+  setup(props) {
     const goToVideo = () => {
-      window.location.href = "/watch";
+      window.location.href = "/watch/" + props.result.id;
     };
     return {
       imageLogo,

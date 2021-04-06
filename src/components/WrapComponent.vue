@@ -59,7 +59,10 @@
           </div>
         </div>
         <div v-if="viewall" class="wc__channel__upload__header__right">
-          <button class="wc__channel__upload__header__button">
+          <button
+            class="wc__channel__upload__header__button"
+            @click="switchViewAll"
+          >
             VIEW ALL
           </button>
         </div>
@@ -84,8 +87,17 @@
           gridRepeat == 4 ? 'wc__channel__upload__wrap__gridRepeat--4' : ''
         ]"
       >
+        <i
+          v-if="prevButton"
+          class="fas fa-chevron-left"
+          @click="prevRecommendMovies"
+        ></i>
         <slot></slot>
-        <i v-if="nextButton" class="fas fa-chevron-right"></i>
+        <i
+          v-if="nextButton"
+          class="fas fa-chevron-right"
+          @click="nextRecommendMovies"
+        ></i>
       </div>
     </div>
   </div>
@@ -111,6 +123,9 @@ export default {
       type: Boolean,
       required: false
     },
+    prevButton: {
+      type: Boolean
+    },
     nextButton: {
       type: Boolean,
       required: false
@@ -130,7 +145,10 @@ export default {
     myWidth: {
       type: Number,
       required: false
-    }
+    },
+    nextRecommendMovies: Function,
+    prevRecommendMovies: Function,
+    switchViewAll: Function
   },
   components: {},
   setup() {
@@ -149,7 +167,7 @@ export default {
 
 .wc__channel__upload {
   width: 100%;
-  height: 320px;
+  min-height: 330px;
   margin: 0 auto;
   border-bottom: 1px solid lightgrey;
 }
@@ -189,7 +207,7 @@ export default {
 }
 
 .wc__channel__upload--movie {
-  height: 100%;
+  min-height: 385px;
 }
 .wc__channel__upload--live {
   height: 100%;
@@ -253,7 +271,7 @@ export default {
   font-size: 1rem;
 }
 .wc__channel__upload__header__maintext--sports {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 .wc__channel__upload__header__subtext {
   text-align: left;
@@ -287,15 +305,18 @@ export default {
   height: 224px;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  column-gap: 5px;
+  grid-auto-flow: row;
+  column-gap: 15px;
   position: relative;
+  margin-top: 30px;
 }
 .wc__channel__upload__wrap--7 {
   width: 100%;
   height: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  column-gap: 5px;
+  grid-auto-flow: row;
+  column-gap: 15px;
   position: relative;
 }
 .wc__channel__upload__wrap--8 {
@@ -303,7 +324,8 @@ export default {
   height: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  column-gap: 5px;
+  grid-auto-flow: row;
+  column-gap: 15px;
   position: relative;
 }
 .wc__channel__upload__wrap--9 {
@@ -311,25 +333,45 @@ export default {
   height: 100%;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  column-gap: 5px;
+  grid-auto-flow: row;
+  column-gap: 15px;
   position: relative;
 }
 .wc__channel__upload__wrap--10 {
   width: 100%;
   height: 100%;
   display: grid;
+  grid-auto-flow: row;
   grid-template-columns: repeat(6, 1fr);
-  column-gap: 5px;
+  grid-auto-flow: row;
+  column-gap: 15px;
   position: relative;
 }
 .wc__channel__upload__wrap__gridRepeat--4 {
   grid-template-columns: repeat(4, 1fr);
+  grid-auto-flow: row;
 }
 .wc__channel__upload__wrap--movie {
   height: 100%;
 }
 .wc__channel__upload__wrap--live {
   height: 100%;
+}
+.fa-chevron-left {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  padding: 15px;
+  border-radius: 50%;
+  background-color: white;
+  line-height: 10px;
+  position: absolute;
+  left: -20px;
+  top: 35px;
+  box-shadow: 0 0 5px grey;
+}
+.fa-chevron-left:hover {
+  cursor: pointer;
 }
 .fa-chevron-right {
   display: inline-block;

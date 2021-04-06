@@ -19,6 +19,8 @@
         title="Fashion & Beauty"
         :customizeProfile="true"
         :showSubscriber="true"
+        :subScriberAmount="5000"
+        :goBackToSection="goBackToSection"
       >
         <svg class="fab__component__svg">
           <path
@@ -35,332 +37,101 @@
         </svg>
       </ChannelWrap>
     </div>
-    <div class="outer__wrap__component">
-      <WrapComponent
-        :myWidth="viewportWidth"
-        title="London Fashion Week"
-        subTitle="Curated by the British Fashion Council"
-        :nextButton="true"
-        :viewall="true"
-        :subTitleColor="true"
-      >
-        <template v-if="viewportWidth == 7">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 8">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 9">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 10">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-      </WrapComponent>
+    <template v-if="viewAll">
+      <div class="outer__wrap__viewall">
+        <WrapComponent
+          :myWidth="viewportWidth"
+          title="Fashion Videos"
+          subTitle="Enjoy the show"
+          :nextButton="false"
+          :viewall="false"
+          :subTitleColor="true"
+        >
+          <template v-for="each in fashion" :key="each.id">
+            <PromoteVideo
+              :titleColor="true"
+              :channelColor="true"
+              :infoColor="true"
+              :video="each"
+              :userId="each.userId"
+            />
+          </template>
+        </WrapComponent>
+      </div>
+    </template>
+    <template v-if="!viewAll">
+      <div class="outer__wrap__component">
+        <WrapComponent
+          :myWidth="viewportWidth"
+          title="London Fashion Week"
+          subTitle="Curated by the British Fashion Council"
+          :nextButton="false"
+          :viewall="false"
+          :subTitleColor="true"
+        >
+          <template v-for="event in events" :key="event.id">
+            <PromoteVideo
+              :titleColor="true"
+              :channelColor="true"
+              :infoColor="true"
+              :video="event"
+              :userId="event.userId"
+            />
+          </template>
+        </WrapComponent>
 
-      <WrapComponent
-        :myWidth="viewportWidth"
-        title="The collections"
-        subTitle="Fashion shows straight from the runway"
-        :nextButton="true"
-        :viewall="true"
-        :subTitleColor="true"
-        ><template v-if="viewportWidth == 7">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 8">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 9">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 10">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-      </WrapComponent>
-      <WrapComponent
-        :myWidth="viewportWidth"
-        title="Stories of style"
-        subTitle="You look inside the fashion industry"
-        :nextButton="true"
-        :viewall="true"
-        :subTitleColor="true"
-        ><template v-if="viewportWidth == 7">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 8">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 9">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-        <template v-if="viewportWidth == 10">
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-          <PromoteVideo
-            :titleColor="true"
-            :channelColor="true"
-            :infoColor="true"
-          />
-        </template>
-      </WrapComponent>
-      <WrapComponent
-        :myWidth="viewportWidth"
-        title="Channels to explore"
-        subTitle="Fashion and beauty channels to watch"
-        :nextButton="true"
-        :viewall="true"
-        :subTitleColor="true"
-        componentType="Channel"
-      >
-        <template v-if="viewportWidth == 7">
-          <Channel />
-          <Channel />
-        </template>
-        <template v-if="viewportWidth == 8">
-          <Channel />
-          <Channel />
-          <Channel />
-        </template>
-        <template v-if="viewportWidth == 9">
-          <Channel />
-          <Channel />
-          <Channel />
-          <Channel />
-          <Channel />
-        </template>
-        <template v-if="viewportWidth == 10">
-          <Channel />
-          <Channel />
-          <Channel />
-          <Channel />
-          <Channel />
-          <Channel />
-        </template>
-      </WrapComponent>
-    </div>
+        <WrapComponent
+          :myWidth="viewportWidth"
+          title="The collections"
+          subTitle="Fashion shows straight from the runway"
+          :nextButton="false"
+          :viewall="true"
+          :subTitleColor="true"
+          :switchViewAll="switchViewAll"
+        >
+          <template v-for="collection in collection" :key="collection.id">
+            <PromoteVideo
+              :titleColor="true"
+              :channelColor="true"
+              :infoColor="true"
+              :video="collection"
+              :userId="collection.userId"
+            />
+          </template>
+        </WrapComponent>
+        <WrapComponent
+          :myWidth="viewportWidth"
+          title="Stories of style"
+          subTitle="You look inside the fashion industry"
+          :nextButton="false"
+          :viewall="false"
+          :subTitleColor="true"
+        >
+          <template v-for="story in stories" :key="story.id">
+            <PromoteVideo
+              :titleColor="true"
+              :channelColor="true"
+              :infoColor="true"
+              :video="story"
+              :userId="story.userId"
+            />
+          </template>
+        </WrapComponent>
+        <WrapComponent
+          :myWidth="viewportWidth"
+          title="Channels to explore"
+          subTitle="Fashion and beauty channels to watch"
+          :nextButton="false"
+          :viewall="false"
+          :subTitleColor="true"
+          componentType="Channel"
+        >
+          <template v-for="channel in channels" :key="channel.id">
+            <Channel :channel="channel" />
+          </template>
+        </WrapComponent>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -371,13 +142,59 @@ import ChannelWrap from "@/components/ChannelWrap.vue";
 import WrapComponent from "@/components/WrapComponent.vue";
 import PromoteVideo from "@/components/PromoteVideo.vue";
 import Channel from "@/components/Channel.vue";
+import EventService from "@/services/EventService.js";
+
 import { onMounted, reactive, toRefs } from "vue";
+import { useRoute } from "vue-router";
 export default {
   name: "FashionAndBeauty",
-  setup() {
+  props: {
+    changeCurrentRoute: Function
+  },
+  setup(props) {
     const state = reactive({
-      viewportWidth: 10
+      viewAll: false,
+      viewportWidth: 10,
+      fashion: [],
+      events: [],
+      collection: [],
+      stories: [],
+      channels: []
     });
+    //pass route name back to app
+    let name = useRoute().path;
+    console.log(useRoute());
+    console.log("passname:", name);
+    props.changeCurrentRoute(name);
+
+    EventService.getFashion().then(response => {
+      console.log("fashion!:", state.fashion);
+      let fashion = [];
+      let event = [];
+      let collection = [];
+      let stories = [];
+      let channels = [];
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i].category != "channel") {
+          fashion.push(response.data[i]);
+        }
+        if (response.data[i].category == "event") {
+          event.push(response.data[i]);
+        } else if (response.data[i].category == "collection") {
+          collection.push(response.data[i]);
+        } else if (response.data[i].category == "story") {
+          stories.push(response.data[i]);
+        } else if (response.data[i].category == "channel") {
+          channels.push(response.data[i]);
+        }
+      }
+      state.events = event;
+      state.collection = collection;
+      state.stories = stories;
+      state.channels = channels;
+      state.fashion = fashion;
+    });
+
     onMounted(() => {
       let viewWidth = document.documentElement.clientWidth;
       if (viewWidth >= 1824) {
@@ -407,6 +224,15 @@ export default {
       });
     };
     checkViewport();
+
+    const goBackToSection = () => {
+      window.location.href = "/fashion";
+    };
+    const switchViewAll = () => {
+      console.log("true!");
+      state.viewAll = true;
+      console.log("switchto true:", state.fashion);
+    };
     return {
       ...toRefs(state),
       rocks,
@@ -414,7 +240,9 @@ export default {
       ChannelWrap,
       WrapComponent,
       PromoteVideo,
-      Channel
+      Channel,
+      goBackToSection,
+      switchViewAll
     };
   }
 };
@@ -513,6 +341,11 @@ export default {
   .outer__wrap__component {
     width: 1281px;
     height: 100%;
+    margin: 0 auto;
+  }
+  .outer__wrap__viewall {
+    width: 1281px;
+    min-height: 500px;
     margin: 0 auto;
   }
 }

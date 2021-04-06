@@ -1,12 +1,13 @@
 <template>
   <div class="trending">
-    <TrendingWrapper :myWidth="viewportWidth" />
+    <TrendingWrapper :videos="videos" :myWidth="viewportWidth" />
   </div>
 </template>
 
 <script>
 import TrendingWrapper from "@/components/TrendingWrapper.vue";
 import { reactive, toRefs } from "vue";
+import EventService from "@/services/EventService.js";
 
 export default {
   name: "Trending",
@@ -15,11 +16,17 @@ export default {
   },
   setup() {
     const state = reactive({
-      viewportWidth: 1900
+      viewportWidth: 1900,
+      videos: []
     });
+
+    EventService.getVideos().then(response => {
+      state.videos = response.data;
+    });
+
     //run it one time before resize happen
     let viewWidth = document.documentElement.clientWidth;
-    console.log("width:", viewWidth);
+
     if (viewWidth >= 1824) {
       state.viewportWidth = 10;
       state.showLeftNav = true;
@@ -38,7 +45,7 @@ export default {
       //
       window.addEventListener("resize", function() {
         let viewWidth = document.documentElement.clientWidth;
-        console.log("width:", viewWidth);
+
         if (viewWidth >= 1824) {
           state.viewportWidth = 10;
         } else if (viewWidth >= 1224) {
@@ -61,7 +68,7 @@ export default {
 <style scoped>
 .trending {
   width: 100%;
-  height: 100%;
+  min-height: 93.5vh;
   background-color: rgb(235, 235, 235);
 }
 

@@ -1,9 +1,12 @@
 <template>
   <div class="pv" @click="goToVideo">
-    <div class="pv__thumbnail">
-      <img :src="profile" class="pv__thumbnail__img" />
+    <div class="pv__thumbnail" v-if="video">
+      <img
+        :src="require('@/assets/' + video.thumbnail)"
+        class="pv__thumbnail__img"
+      />
     </div>
-    <div class="pv__wrap">
+    <div class="pv__wrap" v-if="video">
       <div class="pv__details">
         <div
           :class="[
@@ -12,7 +15,7 @@
               : 'pv__details__title'
           ]"
         >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit
+          {{ video.title }}
         </div>
         <div
           :class="[
@@ -22,7 +25,7 @@
           ]"
           @click.stop="goToChannel"
         >
-          REdi
+          {{ video.profileName }}
         </div>
         <div
           :class="[
@@ -31,7 +34,7 @@
               : 'pv__details__viewsAndDate'
           ]"
         >
-          50K &bullet; 2 weeks ago
+          {{ viewsCount() }} views &bullet; {{ video.profilePostDate }}
         </div>
         <div v-if="showCC" class="pv__details__cc">CC</div>
       </div>
@@ -93,8 +96,8 @@
 </template>
 
 <script>
-import profile from "@/assets/profile.png";
 import { reactive, toRefs } from "vue";
+
 export default {
   name: "PromoteVideo",
   props: {
@@ -117,25 +120,55 @@ export default {
     componentType: {
       type: String,
       required: false
-    }
+    },
+    video: {
+      type: Object,
+      required: false
+    },
+    userId: {
+      type: Number,
+      required: true
+    },
+    likedVideo: String
   },
-  setup() {
+  setup(props) {
     const state = reactive({
       showOption: false
     });
 
     const goToVideo = () => {
-      window.location.href = "/watch";
+      window.location.href = "/watch/" + props.video.id;
     };
     const goToChannel = () => {
-      window.location.href = "/channel/dfdf";
+      window.location.href = "/channel/" + (props.userId ? props.userId : "1");
     };
     const showOptionSwitch = () => {
       state.showOption = !state.showOption;
     };
+    const viewsCount = () => {
+      if (props.video) {
+        let views = props.video.viewscount.toString().split("");
+        let newArrayView = [];
+        let indexNum = 1;
+
+        for (let i = views.length - 1; i >= 0; i--) {
+          if (indexNum == 3) {
+            newArrayView.unshift(views[i]);
+            if (views[i - 1] != undefined) {
+              newArrayView.unshift(",");
+            }
+            indexNum = 1;
+          } else {
+            newArrayView.unshift(views[i]);
+            indexNum++;
+          }
+        }
+        return newArrayView.join("");
+      }
+    };
     return {
       ...toRefs(state),
-      profile,
+      viewsCount,
       goToVideo,
       goToChannel,
       showOptionSwitch
@@ -191,14 +224,14 @@ export default {
 }
 .pv__details__title {
   width: 100%;
-  height: 33%;
+  max-height: 33%;
   margin-top: 2%;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
 }
 .pv__details__title--white {

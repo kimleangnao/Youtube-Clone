@@ -1,7 +1,11 @@
 <template>
   <div class="">
     <div class="subscription">
-      <SubscriptionsWrapper :myWidth="viewportWidth" title="Today" />
+      <SubscriptionsWrapper
+        :user="user"
+        :myWidth="viewportWidth"
+        title="Subscription feed"
+      />
     </div>
   </div>
 </template>
@@ -9,6 +13,8 @@
 <script>
 import SubscriptionsWrapper from "@/components/SubscriptionsWrapper.vue";
 import { reactive, toRefs } from "vue";
+import EventService from "@/services/EventService.js";
+
 export default {
   name: "Subscription",
   components: {
@@ -16,7 +22,15 @@ export default {
   },
   setup() {
     const state = reactive({
-      viewportWidth: 1900
+      viewportWidth: 1900,
+      user: []
+    });
+
+    //1 here is equal to user id right now, the one that login
+    //we need to log in at some point and get that id
+    EventService.getUser(1).then(response => {
+      state.user = response.data;
+      console.log("response.data:", response.data);
     });
 
     let viewWidth = document.documentElement.clientWidth;

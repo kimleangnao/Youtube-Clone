@@ -8,7 +8,9 @@
           @click="goToChannel"
         />
       </div>
-      <div class="pc__channel__name" @click="goToChannel">Redi</div>
+      <div class="pc__channel__name" @click="goToChannel">
+        {{ onTheRise.userName }}
+      </div>
       <div class="pc__channel__tag">Creator on the Rise</div>
     </div>
     <div
@@ -24,12 +26,9 @@
           : 'pc__videos'
       ]"
     >
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
-      <PromoteVideo />
+      <template v-for="video in onTheRise.videos" :key="video.id">
+        <PromoteVideo :video="video" :userId="onTheRise.id" />
+      </template>
     </div>
   </div>
 </template>
@@ -45,12 +44,14 @@ export default {
     myWidth: {
       type: Number,
       required: false
-    }
+    },
+    onTheRise: Object
   },
   setup() {
     const goToChannel = () => {
       window.location.href = "/channel/dfdf";
     };
+
     return { profile, goToChannel };
   }
 };

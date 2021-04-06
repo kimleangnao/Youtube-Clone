@@ -92,40 +92,16 @@
     </div>
     <div class="history__wrap">
       <div class="history__wrap__title">Watch history</div>
-      <div class="history__wrap__date">Today</div>
+      <div class="history__wrap__date">History videos</div>
       <div class="history__wrap__component">
-        <TrendingVideo
-          :fromHistoryWidth="viewportWidth"
-          :myWidth="viewportWidth"
-        />
-        <TrendingVideo
-          :fromHistoryWidth="viewportWidth"
-          :myWidth="viewportWidth"
-        />
-        <TrendingVideo
-          :fromHistoryWidth="viewportWidth"
-          :myWidth="viewportWidth"
-        />
-        <TrendingVideo
-          :fromHistoryWidth="viewportWidth"
-          :myWidth="viewportWidth"
-        />
-        <TrendingVideo
-          :fromHistoryWidth="viewportWidth"
-          :myWidth="viewportWidth"
-        />
-        <TrendingVideo
-          :fromHistoryWidth="viewportWidth"
-          :myWidth="viewportWidth"
-        />
-        <TrendingVideo
-          :fromHistoryWidth="viewportWidth"
-          :myWidth="viewportWidth"
-        />
-        <TrendingVideo
-          :fromHistoryWidth="viewportWidth"
-          :myWidth="viewportWidth"
-        />
+        <template v-for="video in user.history" :key="video.id">
+          <TrendingVideo
+            :fromHistoryWidth="viewportWidth"
+            :myWidth="viewportWidth"
+            :video="video"
+            :userId="user.id"
+          />
+        </template>
       </div>
     </div>
   </div>
@@ -133,14 +109,21 @@
 
 <script>
 import TrendingVideo from "@/components/TrendingVideo.vue";
+import EventService from "@/services/EventService.js";
 import { onMounted, reactive, toRefs } from "vue";
 export default {
   name: "History",
   setup() {
     const state = reactive({
       searchInputFocus: false,
-      viewportWidth: 10
+      viewportWidth: 10,
+      user: []
     });
+
+    EventService.getUser(1).then(response => {
+      state.user = response.data;
+    });
+
     onMounted(() => {
       let viewWidth = document.documentElement.clientWidth;
       if (viewWidth >= 1824) {

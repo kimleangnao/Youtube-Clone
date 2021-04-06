@@ -1,11 +1,15 @@
 <template>
   <div class="movie">
-    <div class="movie__frame">
-      <img :src="sunset" alt="movie banner" class="movie__frame__image" />
+    <div class="movie__frame" v-if="activeRecommendMovie">
+      <img
+        :src="require('@/assets/' + activeRecommendMovie.thumbnail)"
+        alt="movie banner"
+        class="movie__frame__image"
+      />
     </div>
-    <div class="movie__details">
+    <div class="movie__details" v-if="activeRecommendMovie">
       <div class="movie__details__title">
-        {{ title }}
+        {{ activeRecommendMovie.title }}
       </div>
 
       <div v-if="!viewers" class="movie__details__amount">Pay to Watch</div>
@@ -13,7 +17,7 @@
         v-else
         class="movie__details__amount movie__details__amount--watching"
       >
-        {{ viewers }}
+        {{ activeRecommendMovie.viewscount }} watching worldwide
       </div>
     </div>
   </div>
@@ -25,14 +29,11 @@ import sunset from "@/assets/sunset.jpg";
 export default {
   name: "Movie",
   props: {
-    title: {
-      type: String,
-      required: true
-    },
     viewers: {
-      type: String,
+      type: Number,
       required: false
-    }
+    },
+    activeRecommendMovie: Object
   },
   setup() {
     return { sunset };
@@ -44,16 +45,20 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap");
 .movie {
   width: 100%;
-  height: 380px;
+  height: 330px;
+  margin-bottom: 50px;
+}
+.movie:hover {
+  cursor: pointer;
 }
 .movie__frame {
   width: 100%;
   height: 280px;
-  background-color: red;
 }
 .movie__frame__image {
   width: 100%;
   height: 100%;
+  border: 1px solid lightgrey;
   object-fit: cover;
 }
 .movie__details {

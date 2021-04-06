@@ -9,7 +9,9 @@
           <ChannelWrap
             :showSubscriber="true"
             :myWidth="viewportWidth"
-            title="Redi"
+            titleColor="black"
+            :title="user.userName ? user.userName : ''"
+            :subScriberAmount="user.subscriberCount"
           />
         </div>
 
@@ -81,12 +83,20 @@
       </div>
     </div>
     <div class="channel__component">
-      <ChannelHome :myWidth="viewportWidth" v-if="home" />
-      <ChannelVideos :myWidth="viewportWidth" v-if="video" />
-      <ChannelPlaylists :myWidth="viewportWidth" v-if="playlists" />
-      <ChannelCommunity :myWidth="viewportWidth" v-if="community" />
-      <ChannelChannels :myWidth="viewportWidth" v-if="channels" />
-      <ChannelAbout v-if="about" />
+      <ChannelHome :user="user" :myWidth="viewportWidth" v-if="home" />
+      <ChannelVideos :user="user" :myWidth="viewportWidth" v-if="video" />
+      <ChannelPlaylists
+        :user="user"
+        :myWidth="viewportWidth"
+        v-if="playlists"
+      />
+      <ChannelCommunity
+        :user="user"
+        :myWidth="viewportWidth"
+        v-if="community"
+      />
+      <ChannelChannels :user="user" :myWidth="viewportWidth" v-if="channels" />
+      <ChannelAbout :user="user" v-if="about" />
     </div>
   </div>
 </template>
@@ -101,7 +111,9 @@ import ChannelCommunity from "@/components/ChannelCommunity.vue";
 import ChannelChannels from "@/components/ChannelChannels.vue";
 import ChannelAbout from "@/components/ChannelAbout.vue";
 import ChannelWrap from "@/components/ChannelWrap.vue";
+import EventService from "@/services/EventService.js";
 
+import { useRoute } from "vue-router";
 import { reactive, toRefs } from "vue";
 export default {
   name: "Channel",
@@ -122,7 +134,16 @@ export default {
       community: false,
       channels: false,
       about: false,
-      viewportWidth: 1900
+      viewportWidth: 1900,
+      user: []
+    });
+
+    //okay call eventService and get user from the ID
+    //so I need first, from the param
+    let paramId = useRoute().params.id;
+    EventService.getUser(paramId).then(response => {
+      state.user = response.data;
+      console.log("responsedata:", response.data);
     });
 
     const switchToHome = () => {
@@ -165,7 +186,6 @@ export default {
       state.channels = true;
       state.about = false;
     };
-
     const switchToAbout = () => {
       state.home = false;
       state.video = false;
@@ -223,7 +243,7 @@ export default {
 @media only screen and (min-width: 321px) {
   .channel {
     width: 100%;
-    background-color: #f1f1f1;
+    background-color: white;
     margin-top: 60px;
     font-family: Roboto, Arial, sans-serif;
     color: black;
@@ -261,7 +281,7 @@ export default {
 @media only screen and (min-width: 768px) {
   .channel {
     width: 100%;
-    background-color: #f1f1f1;
+    background-color: white;
     margin-top: 60px;
     font-family: Roboto, Arial, sans-serif;
     color: black;
@@ -299,7 +319,7 @@ export default {
 @media only screen and (min-width: 1224px) {
   .channel {
     width: 100%;
-    background-color: #f1f1f1;
+    background-color: white;
     margin-top: 60px;
     font-family: Roboto, Arial, sans-serif;
     color: black;
@@ -337,7 +357,7 @@ export default {
 @media only screen and (min-width: 1824px) {
   .channel {
     width: 100%;
-    background-color: #f1f1f1;
+    background-color: white;
     margin-top: 60px;
     font-family: Roboto, Arial, sans-serif;
     color: black;

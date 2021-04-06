@@ -2,7 +2,7 @@
   <div class="video__details">
     <div class="video__details__profile">
       <img
-        :src="video.profilePicture"
+        :src="require('@/assets/' + video.profileImage)"
         class="video__details__profile__image"
         @click="goToChannel"
       />
@@ -11,12 +11,12 @@
       <div class="video__details__wrapper__title">{{ video.title }}</div>
       <div
         class="video__details__wrapper__channelname"
-        @click.stop="goToChannel"
+        @click.stop="goToChannel(video.userId)"
       >
-        {{ video.channelName }}
+        {{ video.profileName }}
       </div>
       <div class="video__details__wrapper__viewsandtime">
-        {{ viewsCount }} views &bullet; {{ convertDate }}
+        {{ viewsCount }} views &bullet; {{ convertDate() }}
       </div>
     </div>
     <div class="video__details__option" @click.stop="switchShowOption">
@@ -100,10 +100,10 @@ export default {
     });
 
     const goToVideo = () => {
-      window.location.href = "/watch";
+      window.location.href = "/watch/" + props.video.id;
     };
-    const goToChannel = () => {
-      window.location.href = "/channel/dfdf";
+    const goToChannel = userId => {
+      window.location.href = "/channel/" + userId;
     };
 
     const viewsCount = computed(() => {
@@ -121,7 +121,7 @@ export default {
       } else if (views.length == 10) {
         return views[0] + "B";
       } else {
-        return "unknown";
+        return views.join("");
       }
     });
 
@@ -152,13 +152,13 @@ export default {
       return [years, months, days, hours, minutes, seconds];
     };
 
-    const convertDate = computed(() => {
-      let startDate = new Date(props.video.uploadDate);
+    const convertDate = () => {
+      let startDate = new Date(props.video.profilePostDate);
       let now = Date.now();
 
       let result = convertTime(now - startDate.getTime());
       let [years, months, days, hours, minutes, seconds] = result;
-
+      //console.log("year", years, months, days, hours, minutes, seconds);
       if (years >= 1) {
         return years + " year ago";
       } else if (months >= 1) {
@@ -174,7 +174,7 @@ export default {
       } else {
         return "unknown ago";
       }
-    });
+    };
 
     const switchShowOption = () => {
       state.showOption = !state.showOption;
@@ -196,12 +196,15 @@ export default {
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
 .video__details {
   width: 100%;
-  height: 100%;
+  max-height: 100%;
   text-align: left;
   position: relative;
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
+}
+.video__details:hover {
+  cursor: pointer;
 }
 .video__details:hover .video__details__option .fa-ellipsis-v {
   display: block;
@@ -223,7 +226,7 @@ export default {
 .video__details__wrapper__title {
   overflow: hidden;
   width: 100%;
-  height: 41%;
+  max-height: 41%;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -232,12 +235,18 @@ export default {
   color: black;
   font-weight: 500;
 }
+.video__details__wrapper__title:hover {
+  cursor: pointer;
+}
 .video__details__wrapper__channelname {
   width: 100%;
   height: 25%;
   line-height: 33px;
   color: rgb(71, 71, 71);
   font-size: 1rem;
+}
+.video__details__wrapper__channelname:hover {
+  cursor: pointer;
 }
 .video__details__wrapper__viewsandtime {
   width: 100%;

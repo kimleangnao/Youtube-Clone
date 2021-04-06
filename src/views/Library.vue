@@ -2,6 +2,7 @@
   <div class="library">
     <div class="library__wrap">
       <SubscriptionsWrapper
+        :user="user"
         :myWidth="viewportWidth"
         title="History"
         :hideManage="true"
@@ -12,6 +13,8 @@
 
 <script>
 import SubscriptionsWrapper from "@/components/SubscriptionsWrapper.vue";
+import EventService from "@/services/EventService.js";
+
 import { onMounted, reactive, toRefs } from "vue";
 export default {
   name: "Library",
@@ -20,7 +23,13 @@ export default {
   },
   setup() {
     const state = reactive({
-      viewportWidth: 1900
+      viewportWidth: 1900,
+      user: []
+    });
+
+    EventService.getUser(1).then(response => {
+      state.user = response.data;
+      console.log("state.user,", state.user);
     });
 
     onMounted(() => {

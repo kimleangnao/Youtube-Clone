@@ -2,29 +2,24 @@
   <div class="channelchannels">
     <WrapComponent
       title="Featured channels"
-      :playall="false"
+      :playall="user.featureChannels.length > 6 ? true : false"
       componentType="Channel"
       :myWidth="myWidth"
     >
-      <Channel />
-      <Channel />
-      <Channel />
-      <Channel />
-      <Channel />
+      <template v-for="channel in user.featureChannels" :key="channel.id">
+        <Channel :channel="channel" />
+      </template>
     </WrapComponent>
     <WrapComponent
-      title="Other Euducator channels"
+      title="Other channels"
       :playall="false"
-      :nextButton="true"
+      :nextButton="user.recommendedChannel.length > 6 ? true : false"
       componentType="Channel"
       :myWidth="myWidth"
     >
-      <Channel />
-      <Channel />
-      <Channel />
-      <Channel />
-      <Channel />
-      <Channel />
+      <template v-for="channel in user.recommendedChannel" :key="channel.id">
+        <Channel :channel="channel" />
+      </template>
     </WrapComponent>
   </div>
 </template>
@@ -39,6 +34,10 @@ export default {
     myWidth: {
       type: Number,
       required: false
+    },
+    user: {
+      type: Object,
+      required: true
     }
   },
   setup() {
