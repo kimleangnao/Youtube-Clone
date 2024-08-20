@@ -1,4 +1,4 @@
-# youtubeclone
+# youtubeclone (outdated)
 
 ## Project setup
 ```
